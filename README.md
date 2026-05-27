@@ -28,7 +28,9 @@ Recommended flow:
 ```text
 web/
 custom_addon/
+config/
 scripts/
+docker-compose.yml
 ```
 
 These folders map to the Odoo server paths:
@@ -36,6 +38,74 @@ These folders map to the Odoo server paths:
 ```text
 web/          -> /opt/odoo/custom-addons/web
 custom_addon/ -> /opt/odoo/odoo18/custom_addon
+```
+
+## Run with Docker
+
+This Docker setup is for local development and quick testing. It runs:
+
+- Odoo 18
+- PostgreSQL 16
+- This repository's custom addons
+
+Start Odoo:
+
+```bash
+cd /home/odoo18/Desktop/s_soluotion
+docker compose up -d
+```
+
+Open Odoo:
+
+```text
+http://localhost:8069
+```
+
+Watch logs:
+
+```bash
+docker compose logs -f odoo
+```
+
+Stop containers:
+
+```bash
+docker compose down
+```
+
+Stop containers and delete Docker database/filestore volumes:
+
+```bash
+docker compose down -v
+```
+
+Docker config file:
+
+```text
+config/odoo.conf.example
+```
+
+Default Docker database values are for local development only:
+
+```text
+db_host = db
+db_user = odoo
+db_password = odoo
+```
+
+Do not use these default passwords for production.
+
+The Docker addons path is:
+
+```text
+/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons/web,/mnt/extra-addons/custom_addon
+```
+
+Installed addons are persisted inside Docker volumes:
+
+```text
+odoo-db-data
+odoo-web-data
 ```
 
 ## Staging Server
@@ -93,4 +163,3 @@ The `web_responsive` addon was patched to remove an outdated XPath targeting:
 ```
 
 That XPath caused a blank white page after login on the Google Cloud production VM.
-

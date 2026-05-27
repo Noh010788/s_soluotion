@@ -13,10 +13,10 @@ venv/
 filestore/
 odoo.conf
 odoo18.conf
+!config/odoo.conf.example
 credentials*
 *.pem
 *.key
 *.pub
 .DS_Store
 Thumbs.db
-

@@ -1,0 +1,63 @@
+<odoo>
+    <record id="product_template_form_view" model="ir.ui.view">
+        <field name="name">rental_product_base.product_template_form_view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view" />
+        <field name="arch" type="xml">
+            <div name="options" position="inside">
+                <span class="d-inline-flex">
+                    <field name="is_rental"/>
+                    <label for="is_rental"/>
+                </span>
+            </div>
+            <xpath expr="//group[@name='internal_notes']" position="before">
+                <group name="product_rental" string="Rental" invisible="not is_rental">
+                    <group>
+                        <field name="rental_price_per_hour" />
+                        <field name="rental_price_per_week" />
+                        <field name="rental_price_per_month" />
+                        <field name="rental_price_per_day" />
+                        <field name="deposit_amount" />
+                    </group>
+                    <group>
+                        <field name="rental_min_hours" />
+                        <field name="rental_min_weeks" />
+                        <field name="rental_min_months" />
+                        <field name="rental_min_days" />
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_rental_template_tree_view" model="ir.ui.view">
+        <field name="name">product.rental.template.product.list</field>
+        <field name="model">product.template</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <list string="Product" multi_edit="1" sample="1">
+                <field name="name" string="Product Name"/>
+                <field name="default_code" optional="show"/>
+                <field name="product_tag_ids" widget="many2many_tags" optional="show"/>
+                <field name="categ_id" optional="hide"/>
+                <field name="is_rental" optional="show"/>
+                <field name="rental_price_per_hour" optional="show"/>
+                <field name="rental_price_per_week" optional="show"/>
+                <field name="rental_price_per_month" optional="show"/>
+                <field name="rental_price_per_day" optional="show"/>
+                <field name="rental_min_hours" optional="show"/>
+                <field name="rental_min_weeks" optional="show"/>
+                <field name="rental_min_months" optional="show"/>
+                <field name="rental_min_days" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_rental_product" model="ir.actions.act_window">
+        <field name="name">Products</field>
+        <field name="res_model">product.template</field>
+        <field name='view_id' ref='product_rental_template_tree_view'/>
+        <field name="domain">[('is_rental', '=', True)]</field>
+        <field name="context">{}</field>
+    </record>
+</odoo>

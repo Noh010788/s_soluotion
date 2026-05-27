@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="paperformat_ss_sale_quotation" model="report.paperformat">
+        <field name="name">SS Sale Quotation A4</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">5</field>
+        <field name="margin_bottom">5</field>
+        <field name="margin_left">8</field>
+        <field name="margin_right">8</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="sale.action_report_saleorder" model="ir.actions.report">
+        <field name="paperformat_id" ref="sale_quotation_ss_report.paperformat_ss_sale_quotation"/>
+    </record>
+
+    <template id="report_saleorder_document_ss" inherit_id="sale.report_saleorder_document" priority="99">
+        <xpath expr="//t[@t-call='web.external_layout']" position="replace">
+            <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)"/>
+            <t t-set="lines_to_report" t-value="doc._get_order_lines_to_report()"/>
+            <t t-call="web.basic_layout">
+                <div class="page ss_quote_page">
+                    <style>
+                        @font-face {
+                            font-family: "Phetsarath OT";
+                            src: url("/sale_quotation_ss_report/static/src/fonts/Phetsarath_OT.ttf") format("truetype");
+                            font-weight: normal;
+                            font-style: normal;
+                        }
+                        .ss_quote_page {
+                            font-family: "Phetsarath OT", "Noto Sans Lao", "DejaVu Sans", sans-serif;
+                            font-size: 13px;
+                            color: #000;
+                            padding: 0;
+                        }
+                        .ss_quote_header {
+                            width: 100%;
+                            height: auto;
+                            margin-bottom: 14px;
+                        }
+                        .ss_quote_title {
+                            text-align: center;
+                            font-size: 18px;
+                            font-weight: 700;
+                            margin: 0 0 8px;
+                        }
+                        table.ss_quote_table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            table-layout: fixed;
+                        }
+                        .ss_quote_table td,
+                        .ss_quote_table th {
+                            border: 1px solid #000;
+                            padding: 4px 7px;
+                            vertical-align: top;
+                        }
+                        .ss_quote_table th {
+                            text-align: center;
+                            font-weight: 400;
+                        }
+                        .ss_center { text-align: center; }
+                        .ss_right { text-align: right; }
+                        .ss_bold { font-weight: 700; }
+                        .ss_no_border { border: 0 !important; }
+                        .ss_partner_box { min-height: 36px; }
+                        .ss_line_name {
+                            text-align: center;
+                            line-height: 1.75;
+                            min-height: 295px;
+                            padding-top: 56px;
+                        }
+                        .ss_line_name .ss_desc {
+                            white-space: pre-line;
+                        }
+                        .ss_product_img {
+                            max-width: 155px;
+                            max-height: 120px;
+                            margin-top: 12px;
+                            object-fit: contain;
+                        }
+                        .ss_summary_label {
+                            text-align: center;
+                            font-weight: 700;
+                        }
+                        .ss_amount_cell {
+                            text-align: right;
+                            white-space: nowrap;
+                        }
+                        .ss_note_cell {
+                            min-height: 62px;
+                            height: 62px;
+                        }
+                        .ss_signature_cell {
+                            height: 178px;
+                            text-align: center;
+                        }
+                        .ss_signature_img {
+                            max-width: 210px;
+                            max-height: 125px;
+                            margin-top: 18px;
+                        }
+                        .ss_footer_note {
+                            width: 100%;
+                            height: auto;
+                            margin-top: 10px;
+                        }
+                    </style>
+
+                    <img src="/sale_quotation_ss_report/static/src/img/header.jpg" class="ss_quote_header"/>
+
+                    <h2 class="ss_quote_title">ໃບສະເໜີລາຄາ/ Quotation</h2>
+
+                    <table class="ss_quote_table">
+                        <colgroup>
+                            <col style="width: 7%;"/>
+                            <col style="width: 40%;"/>
+                            <col style="width: 9%;"/>
+                            <col style="width: 19%;"/>
+                            <col style="width: 21%;"/>
+                        </colgroup>
+                        <tbody>
+                            <tr>
+                                <td colspan="2" rowspan="2" class="ss_center ss_bold" style="vertical-align: middle;">
+                                    <span t-if="doc.client_order_ref" t-field="doc.client_order_ref"/>
+                                    <span t-else="" t-field="doc.partner_id.name"/>
+                                </td>
+                                <td colspan="3" class="ss_right">ເລກທີ: <span t-field="doc.name"/></td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="ss_right">ວັນທີ: <span t-field="doc.date_order" t-options='{"widget": "date", "format": "dd / MM / yyyy"}'/></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="ss_partner_box">ຜູ້ຕິດຕໍ່:</td>
+                                <td colspan="3" class="ss_partner_box">
+                                    <div>ຂໍສະເໜີຂາຍໃຫ້: <span t-field="doc.partner_id.name"/></div>
+                                    <div t-if="doc.partner_id.phone">ໂທ: <span t-field="doc.partner_id.phone"/></div>
+                                    <div t-elif="doc.partner_id.mobile">ໂທ: <span t-field="doc.partner_id.mobile"/></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>ລຳດັບ</th>
+                                <th>ລາຍການ</th>
+                                <th>ຈຳນວນ</th>
+                                <th>ລາຄາຕໍ່ຫົວໜ່ວຍ</th>
+                                <th>ລາຄາລວມ</th>
+                            </tr>
+
+                            <t t-set="line_number" t-value="0"/>
+                            <t t-foreach="lines_to_report" t-as="line">
+                                <t t-if="not line.display_type and line.product_type != 'combo'">
+                                    <t t-set="line_number" t-value="line_number + 1"/>
+                                    <tr>
+                                        <td class="ss_center" style="vertical-align: middle;"><span t-out="line_number"/></td>
+                                        <td>
+                                            <div class="ss_line_name">
+                                                <div class="ss_desc" t-field="line.name"/>
+                                                <img t-if="line.product_id.image_1920" t-att-src="image_data_uri(line.product_id.image_1920)" class="ss_product_img"/>
+                                            </div>
+                                        </td>
+                                        <td class="ss_center" style="vertical-align: middle;">
+                                            <span t-field="line.product_uom_qty" t-options='{"widget": "float", "precision": 0}'/>
+                                            <span t-field="line.product_uom"/>
+                                        </td>
+                                        <td class="ss_amount_cell" style="vertical-align: middle;">
+                                            <span t-field="line.price_unit" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                        </td>
+                                        <td class="ss_amount_cell" style="vertical-align: middle;">
+                                            <span t-field="line.price_subtotal" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <t t-elif="line.display_type == 'line_section' or line.product_type == 'combo'">
+                                    <tr>
+                                        <td colspan="5" class="ss_bold"><span t-field="line.name"/></td>
+                                    </tr>
+                                </t>
+                                <t t-elif="line.display_type == 'line_note'">
+                                    <tr>
+                                        <td colspan="5"><span t-field="line.name"/></td>
+                                    </tr>
+                                </t>
+                            </t>
+
+                            <tr>
+                                <td colspan="2" rowspan="3" class="ss_note_cell">ຂາຍເງື່ອນ:</td>
+                                <td colspan="2" class="ss_summary_label">ລວມເປັນ</td>
+                                <td class="ss_amount_cell"><span t-field="doc.amount_untaxed" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="ss_summary_label">ອາກອນມູນຄ່າເພີ່ມ 10%</td>
+                                <td class="ss_amount_cell"><span t-field="doc.amount_tax" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="ss_summary_label">ລວມເປັນເງິນ</td>
+                                <td class="ss_amount_cell ss_bold"><span t-field="doc.amount_total" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="5" class="ss_center" style="height: 62px;">
+                                    <div>ຮູບແບບການຊຳລະເງິນ ຜູ້ຮັບເງິນ: <span t-field="doc.company_id.name"/></div>
+                                    <div>
+                                        ເລກບັນຊີ:
+                                        <span t-if="doc.company_id.partner_id.bank_ids" t-field="doc.company_id.partner_id.bank_ids[0].acc_number"/>
+                                        <span t-if="doc.company_id.partner_id.bank_ids">
+                                            (<span t-field="doc.company_id.partner_id.bank_ids[0].bank_id.name"/>)
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="2" class="ss_signature_cell">
+                                    <div>ຜູ້ອະນຸມັດສັ່ງຊື້</div>
+                                </td>
+                                <td colspan="3" class="ss_signature_cell">
+                                    <div>ຜູ້ຈຳໜ່າຍສິນຄ້າ</div>
+                                    <img t-if="doc.signature" t-att-src="image_data_uri(doc.signature)" class="ss_signature_img"/>
+                                    <div t-if="doc.signed_by" t-field="doc.signed_by"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <img src="/sale_quotation_ss_report/static/src/img/footer.jpg" class="ss_footer_note"/>
+                </div>
+            </t>
+        </xpath>
+    </template>
+</odoo>

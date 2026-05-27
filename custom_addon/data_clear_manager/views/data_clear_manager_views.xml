@@ -1,0 +1,62 @@
+<odoo>
+    <record id="data_clear_manager_view_form" model="ir.ui.view">
+        <field name="name">data.clear.manager.form</field>
+        <field name="model">data.clear.manager</field>
+        <field name="arch" type="xml">
+            <form string="Clear Data">
+                <sheet>
+                    <field name="clear_target" invisible="1"/>
+                    <field name="result_message" invisible="1"/>
+                    <div invisible="clear_target">
+                        <h2>Clear Data</h2>
+                        <p class="text-muted">
+                            These buttons clear transaction data only. Master data such as products,
+                            partners, warehouses, journals, and chart of accounts is kept.
+                        </p>
+                        <group>
+                            <group>
+                                <button name="action_open_sale_clear" type="object" string="Clear Sale" class="btn-primary"/>
+                                <button name="action_open_purchase_clear" type="object" string="Clear Purchase" class="btn-primary"/>
+                                <button name="action_open_inventory_clear" type="object" string="Clear Inventory" class="btn-primary"/>
+                            </group>
+                            <group>
+                                <button name="action_open_rental_clear" type="object" string="Clear Rental" class="btn-primary"/>
+                                <button name="action_open_maintenance_clear" type="object" string="Clear Maintenance" class="btn-primary"/>
+                                <button name="action_open_accounting_clear" type="object" string="Clear Accounting" class="btn-primary"/>
+                            </group>
+                        </group>
+                    </div>
+                    <div invisible="not clear_target">
+                        <h2>Confirm Clear Data</h2>
+                        <group>
+                            <field name="clear_target"/>
+                            <field name="confirm_text" placeholder="Type CLEAR"/>
+                        </group>
+                        <p class="alert alert-warning" role="alert">
+                            This will permanently delete transaction data for the selected area.
+                            Type CLEAR and click Confirm Clear to continue.
+                        </p>
+                    </div>
+                </sheet>
+                <footer invisible="not clear_target">
+                    <button name="action_clear_data" type="object" string="Confirm Clear" class="btn-danger"/>
+                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="data_clear_manager_action" model="ir.actions.act_window">
+        <field name="name">Clear Data</field>
+        <field name="res_model">data.clear.manager</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+
+    <menuitem id="data_clear_manager_menu_root"
+              name="Clear Data"
+              parent="base.menu_administration"
+              action="data_clear_manager_action"
+              groups="base.group_system"
+              sequence="99"/>
+</odoo>

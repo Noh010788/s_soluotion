@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_inherit_no_negative_stock" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.no.negative.stock</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="stock.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//setting[@id='warning_info']" position="after">
+                <setting id="block_negative_stock"
+                         string="Block Negative Stock"
+                         company_dependent="1"
+                         help="Prevent validating internal, delivery, manufacturing, and scrap operations that would make on-hand stock negative.">
+                    <field name="block_negative_stock"/>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+

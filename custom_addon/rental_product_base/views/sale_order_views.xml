@@ -1,0 +1,396 @@
+<odoo>
+    <record id="view_order_form_rental_type" model="ir.ui.view">
+        <field name="name">rental_product_base.sale.order.form.rental.type</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="before">
+                <field name="order_type" invisible="1"/>
+                <field name="is_rental_order" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']//form//field[@name='price_unit']" position="before">
+                <field name="order_type" invisible="1"/>
+                <field name="rental_type" invisible="order_type != 'rental'"/>
+                <field name="rental_qty" invisible="order_type != 'rental'"/>
+                <field name="rental_start_datetime" invisible="order_type != 'rental'"/>
+                <field name="rental_end_datetime" invisible="order_type != 'rental'" readonly="1"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']//list//field[@name='price_unit']" position="before">
+                <field name="order_type" column_invisible="True"/>
+                <field name="rental_type" column_invisible="parent.order_type != 'rental'" optional="show"/>
+                <field name="rental_qty" column_invisible="parent.order_type != 'rental'" optional="show"/>
+                <field name="rental_start_datetime" column_invisible="parent.order_type != 'rental'" optional="show"/>
+                <field name="rental_end_datetime" column_invisible="parent.order_type != 'rental'" optional="show" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_sales_order_filter_rental" model="ir.ui.view">
+        <field name="name">rental_product_base.sale.order.search.rental</field>
+        <field name="model">sale.order</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <filter name="my_sale_orders_filter" position="after">
+                <separator/>
+                <filter string="Rental Quotations" name="rental_quotations" domain="[('state', 'in', ('draft', 'sent'))]"/>
+                <filter string="Rental Orders" name="rental_orders" domain="[('state', '=', 'sale')]"/>
+                <separator/>
+                <filter string="Order Date" name="rental_order_date" date="date_order"/>
+            </filter>
+            <filter name="my_sale_orders_filter" position="attributes">
+                <attribute name="string">My Rentals</attribute>
+            </filter>
+            <filter name="salesperson" position="attributes">
+                <attribute name="string">Rental Person</attribute>
+            </filter>
+            <field name="team_id" position="attributes">
+                <attribute name="string">Rental Team</attribute>
+            </field>
+            <search position="attributes">
+                <attribute name="string">Search Rental</attribute>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_rental_quotation_tree" model="ir.ui.view">
+        <field name="name">rental_product_base.rental.quotation.list</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <list position="attributes">
+                <attribute name="string">Rental Quotations</attribute>
+            </list>
+            <field name="user_id" position="attributes">
+                <attribute name="string">Rental Person</attribute>
+            </field>
+            <field name="team_id" position="attributes">
+                <attribute name="string">Rental Team</attribute>
+            </field>
+            <field name="state" position="replace">
+                <field name="rental_status"
+                       widget="badge"
+                       decoration-success="rental_status in ('rental_order', 'returned')"
+                       decoration-info="rental_status in ('quotation', 'quotation_sent')"
+                       decoration-muted="rental_status == 'cancel'"
+                       optional="show"/>
+                <field name="rental_remain_label" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_rental_order_tree" model="ir.ui.view">
+        <field name="name">rental_product_base.rental.order.list</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.sale_order_list_upload"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <list position="attributes">
+                <attribute name="string">Rental Orders</attribute>
+            </list>
+            <field name="user_id" position="attributes">
+                <attribute name="string">Rental Person</attribute>
+            </field>
+            <field name="team_id" position="attributes">
+                <attribute name="string">Rental Team</attribute>
+            </field>
+            <field name="state" position="replace">
+                <field name="rental_status"
+                       widget="badge"
+                       decoration-success="rental_status in ('rental_order', 'returned')"
+                       decoration-info="rental_status in ('quotation', 'quotation_sent')"
+                       decoration-muted="rental_status == 'cancel'"
+                       optional="show"/>
+                <field name="rental_remain_label" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_rental_order_form" model="ir.ui.view">
+        <field name="name">rental_product_base.rental.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <form position="attributes">
+                <attribute name="string">Rental</attribute>
+            </form>
+            <xpath expr="//header/field[@name='state']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//header/field[@name='state']" position="after">
+                <field name="rental_status"
+                       widget="statusbar"
+                       statusbar_visible="quotation,quotation_sent,rental_order,returned"/>
+            </xpath>
+            <group name="sales_person" position="attributes">
+                <attribute name="string">Rental</attribute>
+            </group>
+            <field name="user_id" position="attributes">
+                <attribute name="string">Rental Person</attribute>
+            </field>
+            <field name="team_id" position="attributes">
+                <attribute name="string">Rental Team</attribute>
+            </field>
+            <field name="order_line" position="attributes">
+                <attribute name="string">Rental Lines</attribute>
+            </field>
+            <field name="payment_term_id" position="after">
+                <field name="rental_due_datetime" readonly="1"/>
+                <field name="rental_remain_label" readonly="1"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_rental_quotation_kanban" model="ir.ui.view">
+        <field name="name">rental_product_base.rental.quotation.kanban</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sale_order_kanban"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <kanban position="attributes">
+                <attribute name="string">Rental Quotations</attribute>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_rental_order_kanban" model="ir.ui.view">
+        <field name="name">rental_product_base.rental.order.kanban</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.sale_order_kanban_upload"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <kanban position="attributes">
+                <attribute name="string">Rental Orders</attribute>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_rental_order_activity" model="ir.ui.view">
+        <field name="name">rental_product_base.rental.order.activity</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.sale_order_view_activity"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <activity position="attributes">
+                <attribute name="string">Rental</attribute>
+            </activity>
+        </field>
+    </record>
+
+    <record id="view_rental_order_calendar" model="ir.ui.view">
+        <field name="name">rental_product_base.rental.order.calendar</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sale_order_calendar"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <calendar position="attributes">
+                <attribute name="string">Rental Orders</attribute>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_rental_order_graph" model="ir.ui.view">
+        <field name="name">rental_product_base.rental.order.graph</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sale_order_graph"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <graph position="attributes">
+                <attribute name="string">Rental Orders</attribute>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_rental_order_pivot" model="ir.ui.view">
+        <field name="name">rental_product_base.rental.order.pivot</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sale_order_pivot"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <pivot position="attributes">
+                <attribute name="string">Rental Orders</attribute>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="sale.action_orders" model="ir.actions.act_window">
+        <field name="domain">[('state', 'not in', ('draft', 'sent', 'cancel')), ('order_type', '=', 'sale')]</field>
+        <field name="context">{'default_order_type': 'sale'}</field>
+    </record>
+
+    <record id="sale.action_quotations" model="ir.actions.act_window">
+        <field name="domain">[('state', 'in', ('draft', 'sent')), ('order_type', '=', 'sale')]</field>
+        <field name="context">{'search_default_my_quotation': 1, 'default_order_type': 'sale'}</field>
+    </record>
+
+    <record id="sale.action_quotations_with_onboarding" model="ir.actions.act_window">
+        <field name="domain">[('state', 'in', ('draft', 'sent')), ('order_type', '=', 'sale')]</field>
+        <field name="context">{'search_default_my_quotation': 1, 'default_order_type': 'sale'}</field>
+    </record>
+
+    <record id="sale.sale_menu_root" model="ir.ui.menu">
+        <field name="action" ref="sale.action_orders"/>
+    </record>
+
+    <record id="sale.sale_order_menu" model="ir.ui.menu">
+        <field name="action" ref="sale.action_orders"/>
+    </record>
+
+    <record id="sale.menu_sale_order" model="ir.ui.menu">
+        <field name="sequence" eval="5"/>
+    </record>
+
+    <record id="sale.menu_sale_quotations" model="ir.ui.menu">
+        <field name="sequence" eval="10"/>
+    </record>
+
+    <record id="action_rental_return_server" model="ir.actions.server">
+        <field name="name">Return</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">action</field>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">action = records.action_rental_return()</field>
+    </record>
+
+    <record id="action_rental_quotations" model="ir.actions.act_window">
+        <field name="name">Rental Quotations</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">list,kanban,form,calendar,pivot,graph,activity</field>
+        <field name="search_view_id" ref="rental_product_base.view_sales_order_filter_rental"/>
+        <field name="domain">[('state', 'in', ('draft', 'sent')), ('order_type', '=', 'rental')]</field>
+        <field name="context">{'search_default_my_sale_orders_filter': 1, 'default_order_type': 'rental'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new rental quotation
+            </p>
+        </field>
+    </record>
+
+    <record id="action_rental_quotations_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_rental_quotation_tree"/>
+        <field name="act_window_id" ref="action_rental_quotations"/>
+    </record>
+
+    <record id="action_rental_quotations_kanban" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="view_rental_quotation_kanban"/>
+        <field name="act_window_id" ref="action_rental_quotations"/>
+    </record>
+
+    <record id="action_rental_quotations_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="3"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_rental_order_form"/>
+        <field name="act_window_id" ref="action_rental_quotations"/>
+    </record>
+
+    <record id="action_rental_quotations_calendar" model="ir.actions.act_window.view">
+        <field name="sequence" eval="4"/>
+        <field name="view_mode">calendar</field>
+        <field name="view_id" ref="view_rental_order_calendar"/>
+        <field name="act_window_id" ref="action_rental_quotations"/>
+    </record>
+
+    <record id="action_rental_quotations_pivot" model="ir.actions.act_window.view">
+        <field name="sequence" eval="5"/>
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="view_rental_order_pivot"/>
+        <field name="act_window_id" ref="action_rental_quotations"/>
+    </record>
+
+    <record id="action_rental_quotations_graph" model="ir.actions.act_window.view">
+        <field name="sequence" eval="6"/>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_rental_order_graph"/>
+        <field name="act_window_id" ref="action_rental_quotations"/>
+    </record>
+
+    <record id="action_rental_quotations_activity" model="ir.actions.act_window.view">
+        <field name="sequence" eval="7"/>
+        <field name="view_mode">activity</field>
+        <field name="view_id" ref="view_rental_order_activity"/>
+        <field name="act_window_id" ref="action_rental_quotations"/>
+    </record>
+
+    <record id="action_rental_orders" model="ir.actions.act_window">
+        <field name="name">Rental Orders</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">list,kanban,form,calendar,pivot,graph,activity</field>
+        <field name="search_view_id" ref="rental_product_base.view_sales_order_filter_rental"/>
+        <field name="domain">[('state', 'not in', ('draft', 'sent', 'cancel')), ('order_type', '=', 'rental')]</field>
+        <field name="context">{'default_order_type': 'rental'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Confirm a rental quotation to create a rental order
+            </p>
+        </field>
+    </record>
+
+    <record id="action_rental_orders_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_rental_order_tree"/>
+        <field name="act_window_id" ref="action_rental_orders"/>
+    </record>
+
+    <record id="action_rental_orders_kanban" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="view_rental_order_kanban"/>
+        <field name="act_window_id" ref="action_rental_orders"/>
+    </record>
+
+    <record id="action_rental_orders_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="3"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_rental_order_form"/>
+        <field name="act_window_id" ref="action_rental_orders"/>
+    </record>
+
+    <record id="action_rental_orders_calendar" model="ir.actions.act_window.view">
+        <field name="sequence" eval="4"/>
+        <field name="view_mode">calendar</field>
+        <field name="view_id" ref="view_rental_order_calendar"/>
+        <field name="act_window_id" ref="action_rental_orders"/>
+    </record>
+
+    <record id="action_rental_orders_pivot" model="ir.actions.act_window.view">
+        <field name="sequence" eval="5"/>
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="view_rental_order_pivot"/>
+        <field name="act_window_id" ref="action_rental_orders"/>
+    </record>
+
+    <record id="action_rental_orders_graph" model="ir.actions.act_window.view">
+        <field name="sequence" eval="6"/>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_rental_order_graph"/>
+        <field name="act_window_id" ref="action_rental_orders"/>
+    </record>
+
+    <record id="action_rental_orders_activity" model="ir.actions.act_window.view">
+        <field name="sequence" eval="7"/>
+        <field name="view_mode">activity</field>
+        <field name="view_id" ref="view_rental_order_activity"/>
+        <field name="act_window_id" ref="action_rental_orders"/>
+    </record>
+
+    <menuitem id="menu_rental_quotations"
+              name="Quotations"
+              parent="rental_menu_base.menu_rental_root"
+              sequence="1"
+              action="action_rental_quotations"/>
+
+    <menuitem id="menu_rental_orders"
+              name="Orders"
+              parent="rental_menu_base.menu_rental_root"
+              sequence="2"
+              action="action_rental_orders"/>
+</odoo>

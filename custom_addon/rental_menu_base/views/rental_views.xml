@@ -1,0 +1,5 @@
+<odoo>
+    <!-- Main menu for Rental Deposits under Rental -->
+    <menuitem id="menu_rental_root" name="Rental" sequence="10"
+              web_icon="rental_menu_base,static/description/icon.png"/>
+</odoo>

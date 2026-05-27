@@ -1,0 +1,40 @@
+<odoo>
+    <record id="rental_product_maintenance" model="ir.ui.view">
+        <field name="name">rental_product_maintenance</field>
+        <field name="model">maintenance.request</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_request_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/button[@name='archive_equipment_request']" position="before">
+                <button name="action_open_accept_sign_wizard"
+                        type="object"
+                        string="Accept &amp; Sign"
+                        class="btn-primary"
+                        invisible="archive or done or customer_accepted"/>
+            </xpath>
+            <xpath expr="//field[@name='done']" position="after">
+                <field name="customer_accepted" invisible="1"/>
+                <field name="customer_signature" invisible="1"/>
+            </xpath>
+            <field name="equipment_id" position="before">
+                <field name="rental_customer_id"/>
+                <field name="rental_order_id"
+                       domain="[('order_type', '=', 'rental')]"/>
+                <field name="rental_order_line_id"
+                       domain="[('order_id', '=', rental_order_id), ('order_id.order_type', '=', 'rental')]"/>
+            </field>
+            <xpath expr="//label[@for='recurring_maintenance']" position="before">
+                <field name="maintenance_end_datetime"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Customer Acceptance">
+                    <group>
+                        <field name="customer_accepted"/>
+                        <field name="customer_signed_by"/>
+                        <field name="customer_signed_on"/>
+                        <field name="customer_signature" widget="image"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

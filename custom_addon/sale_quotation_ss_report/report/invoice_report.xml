@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="account.account_invoices" model="ir.actions.report">
+        <field name="paperformat_id" ref="sale_quotation_ss_report.paperformat_ss_sale_quotation"/>
+    </record>
+    <record id="account.account_invoices_without_payment" model="ir.actions.report">
+        <field name="paperformat_id" ref="sale_quotation_ss_report.paperformat_ss_sale_quotation"/>
+    </record>
+
+    <template id="report_invoice_document_ss" inherit_id="account.report_invoice_document" priority="99">
+        <xpath expr="//t[@t-call='web.external_layout']" position="replace">
+            <t t-set="o" t-value="o.with_context(lang=lang)"/>
+            <t t-set="product_lines" t-value="o.invoice_line_ids.filtered(lambda line: line.display_type == 'product')"/>
+            <t t-set="note_lines" t-value="o.invoice_line_ids.filtered(lambda line: line.display_type == 'line_note')"/>
+            <t t-call="web.basic_layout">
+                <div class="page ss_invoice_page">
+                    <style>
+                        @font-face {
+                            font-family: "Phetsarath";
+                            src: url("/sale_quotation_ss_report/static/src/fonts/Phetsarath_OT.ttf") format("truetype");
+                            font-weight: 400;
+                            font-style: normal;
+                        }
+                        @font-face {
+                            font-family: "Phetsarath";
+                            src: url("/sale_quotation_ss_report/static/src/fonts/Phetsarath_OT_Bold.ttf") format("truetype");
+                            font-weight: 700;
+                            font-style: normal;
+                        }
+                        .ss_invoice_page,
+                        .ss_invoice_page * {
+                            font-family: "Phetsarath" !important;
+                        }
+                        .ss_invoice_page {
+                            font-size: 13px;
+                            color: #000;
+                            padding: 0;
+                        }
+                        .ss_invoice_header,
+                        .ss_invoice_footer {
+                            width: 100%;
+                            height: auto;
+                        }
+                        .ss_invoice_header { margin-bottom: 14px; }
+                        .ss_invoice_footer { margin-top: 10px; }
+                        .ss_invoice_title {
+                            text-align: center;
+                            font-size: 18px;
+                            font-weight: 700;
+                            margin: 0 0 8px;
+                        }
+                        table.ss_invoice_table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            table-layout: fixed;
+                        }
+                        .ss_invoice_table td,
+                        .ss_invoice_table th {
+                            border: 1px solid #000;
+                            padding: 4px 7px;
+                            vertical-align: top;
+                        }
+                        .ss_invoice_table th {
+                            text-align: center;
+                            font-weight: 400;
+                        }
+                        .ss_invoice_center { text-align: center; }
+                        .ss_invoice_right { text-align: right; }
+                        .ss_invoice_bold { font-weight: 700; }
+                        .ss_invoice_partner_box { min-height: 36px; }
+                        .ss_invoice_line {
+                            text-align: center;
+                            line-height: 1.75;
+                            min-height: 295px;
+                            padding-top: 56px;
+                        }
+                        .ss_invoice_product_img {
+                            max-width: 155px;
+                            max-height: 120px;
+                            margin-top: 12px;
+                            object-fit: contain;
+                        }
+                        .ss_invoice_summary_label {
+                            text-align: center;
+                            font-weight: 700;
+                        }
+                        .ss_invoice_amount {
+                            text-align: right;
+                            white-space: nowrap;
+                        }
+                        .ss_invoice_note {
+                            min-height: 62px;
+                            height: 62px;
+                        }
+                        .ss_invoice_signature {
+                            height: 178px;
+                            text-align: center;
+                        }
+                    </style>
+
+                    <img src="/sale_quotation_ss_report/static/src/img/header.jpg" class="ss_invoice_header"/>
+
+                    <h2 class="ss_invoice_title">ໃບເກັບເງິນ/INVOICE</h2>
+
+                    <table class="ss_invoice_table">
+                        <colgroup>
+                            <col style="width: 7%;"/>
+                            <col style="width: 40%;"/>
+                            <col style="width: 9%;"/>
+                            <col style="width: 19%;"/>
+                            <col style="width: 21%;"/>
+                        </colgroup>
+                        <tbody>
+                            <tr>
+                                <td colspan="2" rowspan="3" style="vertical-align: middle; text-align: left;">
+                                    <div>
+                                        ພະນັກງານຂາຍ:
+                                        <span t-if="o.invoice_user_id" t-field="o.invoice_user_id.name"/>
+                                    </div>
+                                    <div t-if="o.invoice_user_id.employee_id.work_phone">
+                                        ເບີໂທ: <span t-field="o.invoice_user_id.employee_id.work_phone"/>
+                                    </div>
+                                    <div t-elif="o.invoice_user_id.employee_id.mobile_phone">
+                                        ເບີໂທ: <span t-field="o.invoice_user_id.employee_id.mobile_phone"/>
+                                    </div>
+                                </td>
+                                <td colspan="3" class="ss_invoice_right">
+                                    ເລກທີ: <span t-field="o.name"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="ss_invoice_right">
+                                    ວັນທີ:
+                                    <span t-if="o.invoice_date" t-field="o.invoice_date" t-options='{"widget": "date", "format": "dd / MM / yyyy"}'/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="ss_invoice_partner_box">
+                                    <div>ຂໍສະເໜີຂາຍໃຫ້: <span t-field="o.partner_id.name"/></div>
+                                    <div t-if="o.partner_id.phone">ໂທ: <span t-field="o.partner_id.phone"/></div>
+                                    <div t-elif="o.partner_id.mobile">ໂທ: <span t-field="o.partner_id.mobile"/></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>ລຳດັບ</th>
+                                <th>ລາຍການ</th>
+                                <th>ຈຳນວນ</th>
+                                <th>ລາຄາຕໍ່ຫົວໜ່ວຍ</th>
+                                <th>ລາຄາລວມ</th>
+                            </tr>
+
+                            <t t-set="line_number" t-value="0"/>
+                            <t t-foreach="product_lines" t-as="line">
+                                <t t-set="line_number" t-value="line_number + 1"/>
+                                <tr>
+                                    <td class="ss_invoice_center" style="vertical-align: middle;">
+                                        <span t-out="line_number"/>
+                                    </td>
+                                    <td>
+                                        <div class="ss_invoice_line">
+                                            <div t-field="line.name" style="white-space: pre-line;"/>
+                                            <img t-if="line.product_id.image_1920"
+                                                 t-att-src="image_data_uri(line.product_id.image_1920)"
+                                                 class="ss_invoice_product_img"/>
+                                        </div>
+                                    </td>
+                                    <td class="ss_invoice_center" style="vertical-align: middle;">
+                                        <span t-field="line.quantity" t-options='{"widget": "float", "precision": 0}'/>
+                                        <span t-field="line.product_uom_id"/>
+                                    </td>
+                                    <td class="ss_invoice_amount" style="vertical-align: middle;">
+                                        <span t-field="line.price_unit" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                    </td>
+                                    <td class="ss_invoice_amount" style="vertical-align: middle;">
+                                        <span t-field="line.price_subtotal" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                    </td>
+                                </tr>
+                            </t>
+
+                            <tr>
+                                <td colspan="2" rowspan="3" class="ss_invoice_note">
+                                    <div>ໝາຍເຫດ:</div>
+                                    <t t-foreach="note_lines" t-as="note_line">
+                                        <div style="white-space: pre-line;" t-field="note_line.name"/>
+                                    </t>
+                                </td>
+                                <td colspan="2" class="ss_invoice_summary_label">ລວມເງິນ</td>
+                                <td class="ss_invoice_amount">
+                                    <span t-field="o.amount_untaxed" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="ss_invoice_summary_label">ອາກອນມູນຄ່າເພີ່ມ 10%</td>
+                                <td class="ss_invoice_amount">
+                                    <span t-field="o.amount_tax" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="ss_invoice_summary_label">ລວມທັງໝົດ</td>
+                                <td class="ss_invoice_amount ss_invoice_bold">
+                                    <span t-field="o.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="5" class="ss_invoice_center" style="height: 62px;">
+                                    <div>ຮູບແບບການຊຳລະເງິນ ຊື່ບັນຊີ: <span t-field="o.company_id.name"/></div>
+                                    <div>
+                                        ເລກບັນຊີ:
+                                        <span t-if="o.company_id.partner_id.bank_ids" t-field="o.company_id.partner_id.bank_ids[0].acc_number"/>
+                                        <span t-if="o.company_id.partner_id.bank_ids">
+                                            (<span t-field="o.company_id.partner_id.bank_ids[0].bank_id.name"/>)
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="2" class="ss_invoice_signature">
+                                    <div>ຜູ້ອະນຸມັດຊື້</div>
+                                </td>
+                                <td colspan="3" class="ss_invoice_signature">
+                                    <div>ຜູ້ອຳນວຍການ</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <img src="/sale_quotation_ss_report/static/src/img/footer.jpg" class="ss_invoice_footer"/>
+                </div>
+            </t>
+        </xpath>
+    </template>
+</odoo>

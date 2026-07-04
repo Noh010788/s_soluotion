@@ -26,16 +26,25 @@
                 <div class="page ss_quote_page">
                     <style>
                         @font-face {
-                            font-family: "Phetsarath OT";
+                            font-family: "Phetsarath";
                             src: url("/sale_quotation_ss_report/static/src/fonts/Phetsarath_OT.ttf") format("truetype");
                             font-weight: normal;
                             font-style: normal;
                         }
+                        @font-face {
+                            font-family: "Phetsarath";
+                            src: url("/sale_quotation_ss_report/static/src/fonts/Phetsarath_OT_Bold.ttf") format("truetype");
+                            font-weight: 700;
+                            font-style: normal;
+                        }
                         .ss_quote_page {
-                            font-family: "Phetsarath OT", "Noto Sans Lao", "DejaVu Sans", sans-serif;
+                            font-family: "Phetsarath";
                             font-size: 13px;
                             color: #000;
                             padding: 0;
+                        }
+                        .ss_quote_page * {
+                            font-family: "Phetsarath" !important;
                         }
                         .ss_quote_header {
                             width: 100%;
@@ -125,9 +134,17 @@
                         </colgroup>
                         <tbody>
                             <tr>
-                                <td colspan="2" rowspan="2" class="ss_center ss_bold" style="vertical-align: middle;">
-                                    <span t-if="doc.client_order_ref" t-field="doc.client_order_ref"/>
-                                    <span t-else="" t-field="doc.partner_id.name"/>
+                                <td colspan="2" rowspan="3" style="vertical-align: middle; text-align: left;">
+                                    <div>
+                                        ພະນັກງານຂາຍ:
+                                        <span t-if="doc.user_id" t-field="doc.user_id.name"/>
+                                    </div>
+                                    <div t-if="doc.user_id.employee_id.work_phone">
+                                        ເບີໂທ: <span t-field="doc.user_id.employee_id.work_phone"/>
+                                    </div>
+                                    <div t-elif="doc.user_id.employee_id.mobile_phone">
+                                        ເບີໂທ: <span t-field="doc.user_id.employee_id.mobile_phone"/>
+                                    </div>
                                 </td>
                                 <td colspan="3" class="ss_right">ເລກທີ: <span t-field="doc.name"/></td>
                             </tr>
@@ -135,7 +152,6 @@
                                 <td colspan="3" class="ss_right">ວັນທີ: <span t-field="doc.date_order" t-options='{"widget": "date", "format": "dd / MM / yyyy"}'/></td>
                             </tr>
                             <tr>
-                                <td colspan="2" class="ss_partner_box">ຜູ້ຕິດຕໍ່:</td>
                                 <td colspan="3" class="ss_partner_box">
                                     <div>ຂໍສະເໜີຂາຍໃຫ້: <span t-field="doc.partner_id.name"/></div>
                                     <div t-if="doc.partner_id.phone">ໂທ: <span t-field="doc.partner_id.phone"/></div>
@@ -179,16 +195,16 @@
                                         <td colspan="5" class="ss_bold"><span t-field="line.name"/></td>
                                     </tr>
                                 </t>
-                                <t t-elif="line.display_type == 'line_note'">
-                                    <tr>
-                                        <td colspan="5"><span t-field="line.name"/></td>
-                                    </tr>
-                                </t>
                             </t>
 
                             <tr>
-                                <td colspan="2" rowspan="3" class="ss_note_cell">ຂາຍເງື່ອນ:</td>
-                                <td colspan="2" class="ss_summary_label">ລວມເປັນ</td>
+                                <td colspan="2" rowspan="3" class="ss_note_cell">
+                                    <div>ໝາຍເຫດ:</div>
+                                    <t t-foreach="lines_to_report.filtered(lambda note_line: note_line.display_type == 'line_note')" t-as="note_line">
+                                        <div style="white-space: pre-line;" t-field="note_line.name"/>
+                                    </t>
+                                </td>
+                                <td colspan="2" class="ss_summary_label">ລວມເງິນ</td>
                                 <td class="ss_amount_cell"><span t-field="doc.amount_untaxed" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
                             </tr>
                             <tr>
@@ -196,13 +212,13 @@
                                 <td class="ss_amount_cell"><span t-field="doc.amount_tax" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
                             </tr>
                             <tr>
-                                <td colspan="2" class="ss_summary_label">ລວມເປັນເງິນ</td>
+                                <td colspan="2" class="ss_summary_label">ລວມທັງໝົດ</td>
                                 <td class="ss_amount_cell ss_bold"><span t-field="doc.amount_total" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></td>
                             </tr>
 
                             <tr>
                                 <td colspan="5" class="ss_center" style="height: 62px;">
-                                    <div>ຮູບແບບການຊຳລະເງິນ ຜູ້ຮັບເງິນ: <span t-field="doc.company_id.name"/></div>
+                                    <div>ຮູບແບບການຊຳລະເງິນ ຊື່ບັນຊີ: <span t-field="doc.company_id.name"/></div>
                                     <div>
                                         ເລກບັນຊີ:
                                         <span t-if="doc.company_id.partner_id.bank_ids" t-field="doc.company_id.partner_id.bank_ids[0].acc_number"/>
@@ -215,10 +231,10 @@
 
                             <tr>
                                 <td colspan="2" class="ss_signature_cell">
-                                    <div>ຜູ້ອະນຸມັດສັ່ງຊື້</div>
+                                    <div>ຜູ້ອະນຸມັດຊື້</div>
                                 </td>
                                 <td colspan="3" class="ss_signature_cell">
-                                    <div>ຜູ້ຈຳໜ່າຍສິນຄ້າ</div>
+                                    <div>ຜູ້ອຳນວຍການ</div>
                                     <img t-if="doc.signature" t-att-src="image_data_uri(doc.signature)" class="ss_signature_img"/>
                                     <div t-if="doc.signed_by" t-field="doc.signed_by"/>
                                 </td>

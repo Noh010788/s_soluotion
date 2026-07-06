@@ -47,6 +47,19 @@ class TestReportRendererSelection(unittest.TestCase):
             "@page { size: A4 portrait; margin: 5mm 8mm 5mm 8mm; }",
         )
 
+    def test_font_css_uses_local_phetsarath_files(self):
+        renderer = load_renderer_module()
+
+        css = renderer.build_font_css(
+            regular_url="file:///module/fonts/Phetsarath_OT.ttf",
+            bold_url="file:///module/fonts/Phetsarath_OT_Bold.ttf",
+        )
+
+        self.assertIn('font-family: "Phetsarath OT"', css)
+        self.assertIn("file:///module/fonts/Phetsarath_OT.ttf", css)
+        self.assertIn("file:///module/fonts/Phetsarath_OT_Bold.ttf", css)
+        self.assertIn("font-weight: 700", css)
+
 
 if __name__ == "__main__":
     unittest.main()

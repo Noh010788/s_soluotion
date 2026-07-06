@@ -1,14 +1,16 @@
 import io
 import logging
+from pathlib import Path
 
 from odoo import models
 from odoo.exceptions import UserError
 from odoo.tools.pdf import PdfFileReader, PdfFileWriter
 
-from .report_renderer import build_page_css, is_weasyprint_report
+from .report_renderer import build_font_css, build_page_css, is_weasyprint_report
 
 
 _logger = logging.getLogger(__name__)
+_FONT_DIR = Path(__file__).resolve().parents[1] / "static" / "src" / "fonts"
 
 
 class IrActionsReport(models.Model):
@@ -17,6 +19,7 @@ class IrActionsReport(models.Model):
     def _run_weasyprint(self, bodies, report, landscape=False):
         try:
             from weasyprint import CSS, HTML
+            from weasyprint.text.fonts import FontConfiguration
         except ImportError as error:
             raise UserError(
                 "WeasyPrint is required to render the Lao PDF reports."
@@ -32,11 +35,22 @@ class IrActionsReport(models.Model):
             margin_bottom=paperformat.margin_bottom,
             margin_left=paperformat.margin_left,
         )
-        stylesheets = [CSS(string=page_css)]
+        font_css = build_font_css(
+            regular_url=(_FONT_DIR / "Phetsarath_OT.ttf").as_uri(),
+            bold_url=(_FONT_DIR / "Phetsarath_OT_Bold.ttf").as_uri(),
+        )
+        font_config = FontConfiguration()
+        stylesheets = [
+            CSS(string=page_css, font_config=font_config),
+            CSS(string=font_css, font_config=font_config),
+        ]
         base_url = self._get_report_url()
 
         rendered_pdfs = [
-            HTML(string=body, base_url=base_url).write_pdf(stylesheets=stylesheets)
+            HTML(string=body, base_url=base_url).write_pdf(
+                stylesheets=stylesheets,
+                font_config=font_config,
+            )
             for body in bodies
         ]
         if len(rendered_pdfs) == 1:

@@ -16,7 +16,10 @@ services:
       retries: 5
 
   odoo:
-    image: odoo:18.0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: s_solution_odoo_local:18.0
     container_name: s_solution_odoo
     restart: unless-stopped
     depends_on:

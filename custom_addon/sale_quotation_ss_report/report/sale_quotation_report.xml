@@ -26,25 +26,25 @@
                 <div class="page ss_quote_page">
                     <style>
                         @font-face {
-                            font-family: "Phetsarath";
+                            font-family: "Phetsarath OT";
                             src: url("/sale_quotation_ss_report/static/src/fonts/Phetsarath_OT.ttf") format("truetype");
                             font-weight: normal;
                             font-style: normal;
                         }
                         @font-face {
-                            font-family: "Phetsarath";
+                            font-family: "Phetsarath OT";
                             src: url("/sale_quotation_ss_report/static/src/fonts/Phetsarath_OT_Bold.ttf") format("truetype");
                             font-weight: 700;
                             font-style: normal;
                         }
                         .ss_quote_page {
-                            font-family: "Phetsarath";
+                            font-family: "Phetsarath OT";
                             font-size: 13px;
                             color: #000;
                             padding: 0;
                         }
                         .ss_quote_page * {
-                            font-family: "Phetsarath" !important;
+                            font-family: "Phetsarath OT" !important;
                         }
                         .ss_quote_header {
                             width: 100%;

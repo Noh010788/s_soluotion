@@ -16,20 +16,20 @@
                 <div class="page ss_invoice_page">
                     <style>
                         @font-face {
-                            font-family: "Phetsarath";
+                            font-family: "Phetsarath OT";
                             src: url("/sale_quotation_ss_report/static/src/fonts/Phetsarath_OT.ttf") format("truetype");
                             font-weight: 400;
                             font-style: normal;
                         }
                         @font-face {
-                            font-family: "Phetsarath";
+                            font-family: "Phetsarath OT";
                             src: url("/sale_quotation_ss_report/static/src/fonts/Phetsarath_OT_Bold.ttf") format("truetype");
                             font-weight: 700;
                             font-style: normal;
                         }
                         .ss_invoice_page,
                         .ss_invoice_page * {
-                            font-family: "Phetsarath" !important;
+                            font-family: "Phetsarath OT" !important;
                         }
                         .ss_invoice_page {
                             font-size: 13px;

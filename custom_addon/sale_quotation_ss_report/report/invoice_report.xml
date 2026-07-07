@@ -13,7 +13,7 @@
             <t t-set="product_lines" t-value="o.invoice_line_ids.filtered(lambda line: line.display_type == 'product')"/>
             <t t-set="note_lines" t-value="o.invoice_line_ids.filtered(lambda line: line.display_type == 'line_note')"/>
             <t t-call="web.basic_layout">
-                <div class="page ss_invoice_page">
+                <div class="ss_invoice_page">
                     <style>
                         @font-face {
                             font-family: "Phetsarath OT";
@@ -31,18 +31,52 @@
                         .ss_invoice_page * {
                             font-family: "Phetsarath OT" !important;
                         }
+                        html,
+                        body,
+                        main,
+                        .o_body_html,
+                        .container {
+                            height: auto !important;
+                            min-height: 0 !important;
+                            max-height: none !important;
+                            overflow: visible !important;
+                        }
                         .ss_invoice_page {
                             font-size: 13px;
                             color: #000;
                             padding: 0;
+                            height: auto !important;
+                            min-height: 0 !important;
+                            overflow: visible !important;
+                        }
+                        @page {
+                            size: A4 portrait;
+                            margin: 43mm 8mm 31mm 8mm;
+                        }
+                        .ss_report_header {
+                            position: fixed;
+                            top: -38mm;
+                            left: 0;
+                            right: 0;
+                            width: 100%;
+                        }
+                        .ss_report_footer {
+                            position: fixed;
+                            bottom: -27mm;
+                            left: 0;
+                            right: 0;
+                            width: 100%;
                         }
                         .ss_invoice_header,
                         .ss_invoice_footer {
                             width: 100%;
                             height: auto;
                         }
-                        .ss_invoice_header { margin-bottom: 14px; }
-                        .ss_invoice_footer { margin-top: 10px; }
+                        .ss_invoice_header { margin: 0; }
+                        .ss_invoice_footer {
+                            object-fit: contain;
+                            margin: 0;
+                        }
                         .ss_invoice_title {
                             text-align: center;
                             font-size: 18px;
@@ -53,6 +87,23 @@
                             width: 100%;
                             border-collapse: collapse;
                             table-layout: fixed;
+                            page-break-inside: auto;
+                            break-inside: auto;
+                        }
+                        .ss_invoice_table tr {
+                            page-break-inside: auto;
+                            break-inside: auto;
+                            page-break-after: auto;
+                        }
+                        .ss_product_row {
+                            page-break-inside: avoid;
+                            break-inside: avoid;
+                        }
+                        .ss_summary_row,
+                        .ss_bank_row,
+                        .ss_signature_row {
+                            page-break-inside: avoid;
+                            break-inside: avoid;
                         }
                         .ss_invoice_table td,
                         .ss_invoice_table th {
@@ -71,13 +122,15 @@
                         .ss_invoice_line {
                             text-align: center;
                             line-height: 1.75;
-                            min-height: 295px;
-                            padding-top: 56px;
+                            height: 150px;
+                            min-height: 150px;
+                            padding-top: 12px;
+                            box-sizing: border-box;
                         }
                         .ss_invoice_product_img {
-                            max-width: 155px;
-                            max-height: 120px;
-                            margin-top: 12px;
+                            max-width: 90px;
+                            max-height: 90px;
+                            margin-top: 8px;
                             object-fit: contain;
                         }
                         .ss_invoice_summary_label {
@@ -96,19 +149,51 @@
                             height: 178px;
                             text-align: center;
                         }
+                        table.ss_signature_split {
+                            width: 100%;
+                            border-collapse: collapse;
+                            table-layout: fixed;
+                        }
+                        .ss_signature_split td {
+                            border: 0;
+                            height: 178px;
+                            padding: 4px 7px;
+                            text-align: center;
+                            vertical-align: top;
+                        }
+                        .ss_summary_page {
+                            margin-top: 8px;
+                        }
+                        .ss_summary_page_break {
+                            page-break-before: always;
+                            break-before: page;
+                        }
                     </style>
 
-                    <img src="/sale_quotation_ss_report/static/src/img/header.jpg" class="ss_invoice_header"/>
+                    <div class="ss_report_header">
+                        <img src="/sale_quotation_ss_report/static/src/img/header.jpg" class="ss_invoice_header"/>
+                    </div>
+                    <div class="ss_report_footer">
+                        <img src="/sale_quotation_ss_report/static/src/img/footer.jpg" class="ss_invoice_footer"/>
+                    </div>
+
+                    <t t-set="show_discount" t-value="product_lines.filtered(lambda discount_line: discount_line.discount)"/>
 
                     <h2 class="ss_invoice_title">ໃບເກັບເງິນ/INVOICE</h2>
 
                     <table class="ss_invoice_table">
                         <colgroup>
-                            <col style="width: 7%;"/>
-                            <col style="width: 40%;"/>
-                            <col style="width: 9%;"/>
-                            <col style="width: 19%;"/>
-                            <col style="width: 21%;"/>
+                            <col t-if="not show_discount" style="width: 7%;"/>
+                            <col t-if="not show_discount" style="width: 40%;"/>
+                            <col t-if="not show_discount" style="width: 9%;"/>
+                            <col t-if="not show_discount" style="width: 19%;"/>
+                            <col t-if="not show_discount" style="width: 21%;"/>
+                            <col t-if="show_discount" style="width: 7%;"/>
+                            <col t-if="show_discount" style="width: 35%;"/>
+                            <col t-if="show_discount" style="width: 8%;"/>
+                            <col t-if="show_discount" style="width: 17%;"/>
+                            <col t-if="show_discount" style="width: 13%;"/>
+                            <col t-if="show_discount" style="width: 20%;"/>
                         </colgroup>
                         <tbody>
                             <tr>
@@ -124,18 +209,18 @@
                                         ເບີໂທ: <span t-field="o.invoice_user_id.employee_id.mobile_phone"/>
                                     </div>
                                 </td>
-                                <td colspan="3" class="ss_invoice_right">
+                                <td t-att-colspan="4 if show_discount else 3" class="ss_invoice_right">
                                     ເລກທີ: <span t-field="o.name"/>
                                 </td>
                             </tr>
                             <tr>
-                                <td colspan="3" class="ss_invoice_right">
+                                <td t-att-colspan="4 if show_discount else 3" class="ss_invoice_right">
                                     ວັນທີ:
                                     <span t-if="o.invoice_date" t-field="o.invoice_date" t-options='{"widget": "date", "format": "dd / MM / yyyy"}'/>
                                 </td>
                             </tr>
                             <tr>
-                                <td colspan="3" class="ss_invoice_partner_box">
+                                <td t-att-colspan="4 if show_discount else 3" class="ss_invoice_partner_box">
                                     <div>ຂໍສະເໜີຂາຍໃຫ້: <span t-field="o.partner_id.name"/></div>
                                     <div t-if="o.partner_id.phone">ໂທ: <span t-field="o.partner_id.phone"/></div>
                                     <div t-elif="o.partner_id.mobile">ໂທ: <span t-field="o.partner_id.mobile"/></div>
@@ -146,13 +231,14 @@
                                 <th>ລາຍການ</th>
                                 <th>ຈຳນວນ</th>
                                 <th>ລາຄາຕໍ່ຫົວໜ່ວຍ</th>
+                                <th t-if="show_discount">ສ່ວນຫຼຸດ</th>
                                 <th>ລາຄາລວມ</th>
                             </tr>
 
                             <t t-set="line_number" t-value="0"/>
                             <t t-foreach="product_lines" t-as="line">
                                 <t t-set="line_number" t-value="line_number + 1"/>
-                                <tr>
+                                <tr class="ss_product_row" t-att-style="'page-break-before: always; break-before: page;' if line_number > 1 and (line_number - 1) % 4 == 0 else ''">
                                     <td class="ss_invoice_center" style="vertical-align: middle;">
                                         <span t-out="line_number"/>
                                     </td>
@@ -169,41 +255,52 @@
                                         <span t-field="line.product_uom_id"/>
                                     </td>
                                     <td class="ss_invoice_amount" style="vertical-align: middle;">
-                                        <span t-field="line.price_unit" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        <span t-out="'{:,.0f} {}'.format(line.price_unit, o.currency_id.symbol or '').strip()"/>
+                                    </td>
+                                    <td t-if="show_discount" class="ss_invoice_amount" style="vertical-align: middle;">
+                                        <t t-if="line.discount">
+                                            <div>
+                                                <span t-out="'{:g}'.format(line.discount)"/>%
+                                            </div>
+                                            <div>
+                                                <span t-out="'{:,.0f} {}'.format(line.price_unit * line.quantity * line.discount / 100.0, o.currency_id.symbol or '').strip()"/>
+                                            </div>
+                                        </t>
+                                        <t t-else="">-</t>
                                     </td>
                                     <td class="ss_invoice_amount" style="vertical-align: middle;">
-                                        <span t-field="line.price_subtotal" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        <span t-out="'{:,.0f} {}'.format(line.price_subtotal, o.currency_id.symbol or '').strip()"/>
                                     </td>
                                 </tr>
                             </t>
 
-                            <tr>
+                            <tr class="ss_summary_row" t-att-style="'page-break-before: always; break-before: page;' if line_number and line_number % 4 == 0 else ''">
                                 <td colspan="2" rowspan="3" class="ss_invoice_note">
                                     <div>ໝາຍເຫດ:</div>
                                     <t t-foreach="note_lines" t-as="note_line">
                                         <div style="white-space: pre-line;" t-field="note_line.name"/>
                                     </t>
                                 </td>
-                                <td colspan="2" class="ss_invoice_summary_label">ລວມເງິນ</td>
+                                <td t-att-colspan="3 if show_discount else 2" class="ss_invoice_summary_label">ລວມເງິນ</td>
                                 <td class="ss_invoice_amount">
-                                    <span t-field="o.amount_untaxed" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                    <span t-out="'{:,.0f} {}'.format(o.amount_untaxed, o.currency_id.symbol or '').strip()"/>
                                 </td>
                             </tr>
-                            <tr>
-                                <td colspan="2" class="ss_invoice_summary_label">ອາກອນມູນຄ່າເພີ່ມ 10%</td>
+                            <tr class="ss_summary_row">
+                                <td t-att-colspan="3 if show_discount else 2" class="ss_invoice_summary_label">ອາກອນມູນຄ່າເພີ່ມ 10%</td>
                                 <td class="ss_invoice_amount">
-                                    <span t-field="o.amount_tax" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                    <span t-out="'{:,.0f} {}'.format(o.amount_tax, o.currency_id.symbol or '').strip()"/>
                                 </td>
                             </tr>
-                            <tr>
-                                <td colspan="2" class="ss_invoice_summary_label">ລວມທັງໝົດ</td>
+                            <tr class="ss_summary_row">
+                                <td t-att-colspan="3 if show_discount else 2" class="ss_invoice_summary_label">ລວມທັງໝົດ</td>
                                 <td class="ss_invoice_amount ss_invoice_bold">
-                                    <span t-field="o.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                    <span t-out="'{:,.0f} {}'.format(o.amount_total, o.currency_id.symbol or '').strip()"/>
                                 </td>
                             </tr>
 
-                            <tr>
-                                <td colspan="5" class="ss_invoice_center" style="height: 62px;">
+                            <tr class="ss_bank_row">
+                                <td t-att-colspan="6 if show_discount else 5" class="ss_invoice_center" style="height: 62px;">
                                     <div>ຮູບແບບການຊຳລະເງິນ ຊື່ບັນຊີ: <span t-field="o.company_id.name"/></div>
                                     <div>
                                         ເລກບັນຊີ:
@@ -215,20 +312,26 @@
                                 </td>
                             </tr>
 
-                            <tr>
-                                <td colspan="2" class="ss_invoice_signature">
-                                    <div>ຜູ້ອະນຸມັດຊື້</div>
-                                </td>
-                                <td colspan="3" class="ss_invoice_signature">
-                                    <div>ຜູ້ອຳນວຍການ</div>
+                            <tr class="ss_signature_row">
+                                <td t-att-colspan="6 if show_discount else 5" style="padding: 0;">
+                                    <table class="ss_signature_split">
+                                        <tr>
+                                            <td style="width: 50%;">
+                                                <div>ຜູ້ອະນຸມັດຊື້</div>
+                                            </td>
+                                            <td style="width: 50%; border-left: 1px solid #000;">
+                                                <div>ຜູ້ອຳນວຍການ</div>
+                                            </td>
+                                        </tr>
+                                    </table>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
 
-                    <img src="/sale_quotation_ss_report/static/src/img/footer.jpg" class="ss_invoice_footer"/>
                 </div>
             </t>
+
         </xpath>
     </template>
 </odoo>

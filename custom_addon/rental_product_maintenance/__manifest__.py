@@ -4,16 +4,20 @@
 {
     'name': 'Product Rental Maintenance',
     'summary': '',
-    'version': '18.0.1.0.0',
+    'version': '18.0.2.0.0',
     'author': 'Lucky Kurniawan',
     'website': 'https://github.com/kurniawanlucky/odoo_addons',
     'category': 'Product Management',
-    'depends': ['rental_product_base', 'maintenance'],
+    'depends': ['rental_product_base', 'maintenance', 'repair', 'stock_account'],
     'data': [
+        'security/maintenance_spare_parts_security.xml',
         'security/ir.model.access.csv',
+        'data/spare_parts_data.xml',
         'wizards/maintenance_accept_sign_wizard_views.xml',
         'views/maintenance_request_views.xml',
         'views/product_template_views.xml',
+        'report/maintenance_spare_parts_templates.xml',
+        'report/maintenance_spare_parts_report.xml',
     ],
     'assets': {
         'web.assets_backend': [

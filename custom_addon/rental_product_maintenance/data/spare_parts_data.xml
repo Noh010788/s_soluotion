@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="stock_location_spare_parts" model="stock.location">
+            <field name="name">Spare Parts</field>
+            <field name="usage">internal</field>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="stock_location_maintenance_consumption" model="stock.location">
+            <field name="name">Maintenance Consumption</field>
+            <field name="usage">production</field>
+            <field name="location_id" ref="stock.stock_location_locations_virtual"/>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="picking_type_maintenance_spare_parts" model="stock.picking.type">
+            <field name="name">Maintenance Spare Parts</field>
+            <field name="sequence_code">MSP</field>
+            <field name="code">repair_operation</field>
+            <field name="warehouse_id" ref="stock.warehouse0"/>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="default_location_src_id" ref="stock_location_spare_parts"/>
+            <field name="default_location_dest_id" ref="stock_location_maintenance_consumption"/>
+            <field name="default_remove_location_dest_id" ref="stock.stock_location_stock"/>
+            <field name="default_product_location_src_id" ref="stock.stock_location_stock"/>
+            <field name="default_product_location_dest_id" ref="stock.stock_location_stock"/>
+            <field name="default_recycle_location_dest_id" ref="stock.stock_location_stock"/>
+            <field name="reservation_method">at_confirm</field>
+            <field name="use_create_lots" eval="False"/>
+            <field name="use_existing_lots" eval="True"/>
+        </record>
+
+        <record id="product_category_spare_parts" model="product.category">
+            <field name="name">Spare Parts</field>
+            <field name="parent_id" ref="product.product_category_all"/>
+            <field name="property_cost_method">average</field>
+            <field name="property_valuation">manual_periodic</field>
+        </record>
+
+        <record id="product_category_spare_parts_mechanical" model="product.category">
+            <field name="name">Mechanical</field>
+            <field name="parent_id" ref="product_category_spare_parts"/>
+            <field name="property_cost_method">average</field>
+            <field name="property_valuation">manual_periodic</field>
+        </record>
+
+        <record id="product_category_spare_parts_electrical" model="product.category">
+            <field name="name">Electrical</field>
+            <field name="parent_id" ref="product_category_spare_parts"/>
+            <field name="property_cost_method">average</field>
+            <field name="property_valuation">manual_periodic</field>
+        </record>
+
+        <record id="product_category_spare_parts_consumables" model="product.category">
+            <field name="name">Consumables</field>
+            <field name="parent_id" ref="product_category_spare_parts"/>
+            <field name="property_cost_method">average</field>
+            <field name="property_valuation">manual_periodic</field>
+        </record>
+
+        <record id="product_spare_timing_belt" model="product.product">
+            <field name="name">Timing Belt / ສາຍພານ</field>
+            <field name="default_code">SP-MEC-001</field>
+            <field name="categ_id" ref="product_category_spare_parts_mechanical"/>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="True"/>
+            <field name="tracking">none</field>
+            <field name="is_rental" eval="False"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="uom_po_id" ref="uom.product_uom_unit"/>
+            <field name="standard_price">180000</field>
+            <field name="list_price">250000</field>
+        </record>
+
+        <record id="product_spare_bearing_6204" model="product.product">
+            <field name="name">Bearing 6204 / ລູກປືນ 6204</field>
+            <field name="default_code">SP-MEC-002</field>
+            <field name="categ_id" ref="product_category_spare_parts_mechanical"/>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="True"/>
+            <field name="tracking">none</field>
+            <field name="is_rental" eval="False"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="uom_po_id" ref="uom.product_uom_unit"/>
+            <field name="standard_price">80000</field>
+            <field name="list_price">120000</field>
+        </record>
+
+        <record id="product_spare_fuse_10a" model="product.product">
+            <field name="name">Fuse 10A / ຟິວ 10A</field>
+            <field name="default_code">SP-ELE-001</field>
+            <field name="categ_id" ref="product_category_spare_parts_electrical"/>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="True"/>
+            <field name="tracking">none</field>
+            <field name="is_rental" eval="False"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="uom_po_id" ref="uom.product_uom_unit"/>
+            <field name="standard_price">15000</field>
+            <field name="list_price">25000</field>
+        </record>
+
+        <record id="product_spare_photo_sensor_24v" model="product.product">
+            <field name="name">Photoelectric Sensor 24V / ໂຟໂຕ້ເຊັນເຊີ 24V</field>
+            <field name="default_code">SP-ELE-002</field>
+            <field name="categ_id" ref="product_category_spare_parts_electrical"/>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="True"/>
+            <field name="tracking">serial</field>
+            <field name="lot_valuated" eval="True"/>
+            <field name="is_rental" eval="False"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="uom_po_id" ref="uom.product_uom_unit"/>
+            <field name="standard_price">450000</field>
+            <field name="list_price">650000</field>
+        </record>
+
+        <record id="product_spare_lubricant_1l" model="product.product">
+            <field name="name">Industrial Lubricant 1L / ນ້ຳມັນຫຼໍ່ລື່ນ 1L</field>
+            <field name="default_code">SP-CON-001</field>
+            <field name="categ_id" ref="product_category_spare_parts_consumables"/>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="True"/>
+            <field name="tracking">none</field>
+            <field name="is_rental" eval="False"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="uom_po_id" ref="uom.product_uom_unit"/>
+            <field name="standard_price">70000</field>
+            <field name="list_price">100000</field>
+        </record>
+    </data>
+
+    <data>
+        <function model="product.category" name="_configure_maintenance_spare_parts_accounting"/>
+    </data>
+</odoo>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_maintenance_spare_parts" model="ir.actions.report">
+        <field name="name">Maintenance Spare Parts</field>
+        <field name="model">maintenance.request</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">rental_product_maintenance.report_maintenance_spare_parts</field>
+        <field name="report_file">rental_product_maintenance.report_maintenance_spare_parts</field>
+        <field name="binding_model_id" ref="maintenance.model_maintenance_request"/>
+        <field name="binding_type">report</field>
+        <field name="groups_id" eval="[(4, ref('rental_product_maintenance.group_maintenance_spare_parts_user'))]"/>
+        <field name="print_report_name">'Maintenance Spare Parts - %s' % (object.name)</field>
+    </record>
+</odoo>

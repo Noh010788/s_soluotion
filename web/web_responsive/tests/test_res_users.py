@@ -8,7 +8,7 @@ from odoo.addons.base.tests.common import BaseCommon
 class TestResUsers(BaseCommon):
     def test_compute_redirect_home(self):
         record = new_test_user(self.env, login="jeant@mail.com")
-        self.assertFalse(record.is_redirect_home)
+        self.assertTrue(record.is_redirect_home)
         action = self.env["ir.actions.act_window"].create(
             {
                 "name": "Test Action",

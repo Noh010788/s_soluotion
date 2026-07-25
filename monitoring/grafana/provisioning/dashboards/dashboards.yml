@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: S Solution
+    orgId: 1
+    folder: S Solution
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/json

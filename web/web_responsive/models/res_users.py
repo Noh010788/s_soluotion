@@ -27,6 +27,7 @@ class ResUsers(models.Model):
     is_redirect_home = fields.Boolean(
         string="Redirect to Home",
         help="Redirect to dashboard after signing in",
+        default=True,
         compute="_compute_redirect_home",
         store=True,
         readonly=False,

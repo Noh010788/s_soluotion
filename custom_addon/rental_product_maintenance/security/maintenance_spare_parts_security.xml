@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_maintenance_spare_parts_user" model="res.groups">
+        <field name="name">Maintenance Spare Parts</field>
+        <field name="category_id" ref="base.module_category_manufacturing_maintenance"/>
+        <field name="implied_ids" eval="[(4, ref('stock.group_stock_user'))]"/>
+        <field name="comment">Users who can reserve, issue, consume and return maintenance spare parts.</field>
+    </record>
+
+    <record id="maintenance.group_equipment_manager" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('rental_product_maintenance.group_maintenance_spare_parts_user'))]"/>
+    </record>
+</odoo>

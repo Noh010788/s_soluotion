@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_maintenance_spare_parts">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="rental_product_maintenance.report_maintenance_spare_parts_document"/>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_maintenance_spare_parts_document">
+        <t t-call="web.external_layout">
+            <div class="page">
+                <h2 class="text-center">ໃບບຳລຸງຮັກສາ ແລະ ເບີກອາໄຫຼ່ / Maintenance Spare Parts</h2>
+
+                <div class="row mt-4 mb-3">
+                    <div class="col-6">
+                        <p><strong>Maintenance:</strong> <span t-field="o.name"/></p>
+                        <p><strong>Customer:</strong> <span t-field="o.rental_customer_id"/></p>
+                        <p><strong>Rental Product:</strong> <span t-field="o.rental_product_id"/></p>
+                        <p t-if="o.rental_unit_number"><strong>Rental Unit:</strong> <span t-field="o.rental_unit_number"/></p>
+                    </div>
+                    <div class="col-6">
+                        <p><strong>Scheduled:</strong> <span t-field="o.schedule_date"/></p>
+                        <p><strong>Technician:</strong> <span t-field="o.user_id"/></p>
+                        <p><strong>Repair Order:</strong> <span t-field="o.repair_order_id"/></p>
+                        <p t-if="o.parts_sale_order_id"><strong>Quotation:</strong> <span t-field="o.parts_sale_order_id"/></p>
+                    </div>
+                </div>
+
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-center">No.</th>
+                            <th>Spare Part</th>
+                            <th>Lot/Serial</th>
+                            <th class="text-end">Planned</th>
+                            <th class="text-end">Used</th>
+                            <th>UoM</th>
+                            <th class="text-center">Billable</th>
+                            <th class="text-end">Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="o.spare_part_move_ids" t-as="move">
+                            <td class="text-center"><span t-out="move_index + 1"/></td>
+                            <td><span t-field="move.product_id"/></td>
+                            <td><span t-out="', '.join(move.lot_ids.mapped('name')) or '-'"/></td>
+                            <td class="text-end"><span t-field="move.product_uom_qty"/></td>
+                            <td class="text-end"><span t-field="move.quantity"/></td>
+                            <td><span t-field="move.product_uom"/></td>
+                            <td class="text-center"><span t-out="'Yes' if move.maintenance_billable else 'No'"/></td>
+                            <td class="text-end">
+                                <span t-field="move.maintenance_line_cost"
+                                      t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                            </td>
+                        </tr>
+                        <tr t-if="not o.spare_part_move_ids">
+                            <td colspan="8" class="text-center text-muted">No spare parts used.</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="7" class="text-end">Total Spare Parts Cost</th>
+                            <th class="text-end">
+                                <span t-field="o.spare_parts_cost"
+                                      t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/>
+                            </th>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <div class="row mt-5">
+                    <div class="col-6 text-center">
+                        <strong>Technician</strong>
+                        <div style="height: 100px;"/>
+                        <span t-field="o.user_id"/>
+                    </div>
+                    <div class="col-6 text-center">
+                        <strong>Customer Acceptance</strong>
+                        <div style="height: 75px;">
+                            <img t-if="o.customer_signature"
+                                 t-att-src="image_data_uri(o.customer_signature)"
+                                 style="max-height: 70px; max-width: 260px;"/>
+                        </div>
+                        <span t-field="o.customer_signed_by"/>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

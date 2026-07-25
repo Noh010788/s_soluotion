@@ -29,13 +29,17 @@ patch(WebClient.prototype, {
         });
         this.user = user;
         onWillStart(async () => {
-            const is_redirect_home = await this.orm.searchRead(
+            const userPreferences = await this.orm.searchRead(
                 "res.users",
                 [["id", "=", this.user.userId]],
-                ["is_redirect_home"]
+                ["is_redirect_home", "action_id"]
             );
+            const preferences = userPreferences[0];
             user.updateContext({
-                is_redirect_to_home: is_redirect_home[0]?.is_redirect_home,
+                // The Apps menu is the default landing page unless an
+                // administrator explicitly configured a Home Action.
+                is_redirect_to_home:
+                    preferences?.is_redirect_home || !preferences?.action_id,
             });
         });
         this.redirect = false;

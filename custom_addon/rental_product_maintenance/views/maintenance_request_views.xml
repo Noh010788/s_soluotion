@@ -5,6 +5,34 @@
         <field name="inherit_id" ref="maintenance.hr_equipment_request_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header/button[@name='archive_equipment_request']" position="before">
+                <button name="action_reserve_spare_parts"
+                        type="object"
+                        string="Reserve Parts"
+                        class="btn-primary"
+                        groups="rental_product_maintenance.group_maintenance_spare_parts_user"
+                        invisible="not spare_part_move_ids or parts_state != 'draft'"/>
+                <button name="action_issue_spare_parts"
+                        type="object"
+                        string="Issue Parts"
+                        class="btn-primary"
+                        groups="rental_product_maintenance.group_maintenance_spare_parts_user"
+                        invisible="parts_state != 'confirmed'"/>
+                <button name="action_consume_spare_parts"
+                        type="object"
+                        string="Consume Parts"
+                        class="btn-primary"
+                        groups="rental_product_maintenance.group_maintenance_spare_parts_user"
+                        invisible="parts_state != 'under_repair'"/>
+                <button name="action_return_spare_parts"
+                        type="object"
+                        string="Return / Unreserve Parts"
+                        groups="rental_product_maintenance.group_maintenance_spare_parts_user"
+                        invisible="parts_state not in ('confirmed', 'under_repair')"/>
+                <button name="action_create_spare_parts_quotation"
+                        type="object"
+                        string="Create Parts Quotation"
+                        groups="rental_product_maintenance.group_maintenance_spare_parts_user"
+                        invisible="parts_state != 'done' or parts_sale_order_id"/>
                 <button name="action_open_accept_sign_wizard"
                         type="object"
                         string="Accept &amp; Sign"
@@ -14,6 +42,30 @@
             <xpath expr="//field[@name='done']" position="after">
                 <field name="customer_accepted" invisible="1"/>
                 <field name="customer_signature" invisible="1"/>
+                <field name="repair_order_id" invisible="1"/>
+                <field name="parts_sale_order_id" invisible="1"/>
+                <field name="parts_state" invisible="1"/>
+                <field name="spare_parts_category_id" invisible="1"/>
+            </xpath>
+            <xpath expr="//sheet/div[hasclass('oe_title')]" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_view_parts_repair"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-wrench"
+                            groups="rental_product_maintenance.group_maintenance_spare_parts_user"
+                            invisible="not repair_order_id">
+                        <field name="repair_order_id" widget="statinfo" string="Repair Order"/>
+                    </button>
+                    <button name="action_view_parts_quotation"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-file-text-o"
+                            groups="rental_product_maintenance.group_maintenance_spare_parts_user"
+                            invisible="not parts_sale_order_id">
+                        <field name="parts_sale_order_id" widget="statinfo" string="Parts Quotation"/>
+                    </button>
+                </div>
             </xpath>
             <field name="equipment_id" position="before">
                 <field name="rental_customer_id"/>
@@ -21,11 +73,91 @@
                        domain="[('order_type', '=', 'rental')]"/>
                 <field name="rental_order_line_id"
                        domain="[('order_id', '=', rental_order_id), ('order_id.order_type', '=', 'rental')]"/>
+                <field name="rental_unit_number"/>
             </field>
             <xpath expr="//label[@for='recurring_maintenance']" position="before">
                 <field name="maintenance_end_datetime"/>
             </xpath>
             <xpath expr="//notebook" position="inside">
+                <page string="Used Spare Parts"
+                      name="used_spare_parts"
+                      groups="rental_product_maintenance.group_maintenance_spare_parts_user">
+                    <field name="spare_part_move_ids"
+                           context="{
+                               'default_maintenance_request_id': id,
+                               'default_repair_id': repair_order_id,
+                               'default_repair_line_type': 'add',
+                               'default_product_uom_qty': 1.0,
+                               'default_company_id': company_id,
+                               'default_date': schedule_date
+                           }"
+                           readonly="parts_state in ('done', 'cancel')">
+                        <list string="Used Spare Parts" editable="bottom">
+                            <field name="company_id" column_invisible="True"/>
+                            <field name="repair_id" column_invisible="True"/>
+                            <field name="maintenance_request_id" column_invisible="True"/>
+                            <field name="repair_line_type" column_invisible="True"/>
+                            <field name="state" column_invisible="True"/>
+                            <field name="product_uom_category_id" column_invisible="True"/>
+                            <field name="show_details_visible" column_invisible="True"/>
+                            <field name="has_tracking" column_invisible="True"/>
+                            <field name="move_lines_count" column_invisible="True"/>
+                            <field name="maintenance_currency_id" column_invisible="True"/>
+                            <field name="product_id"
+                                   required="1"
+                                   domain="[('categ_id', 'child_of', parent.spare_parts_category_id), ('is_storable', '=', True)]"
+                                   readonly="parent.parts_state not in ('none', 'draft')"/>
+                            <field name="product_uom_qty"
+                                   string="Planned Qty"
+                                   readonly="parent.parts_state not in ('none', 'draft')"/>
+                            <field name="quantity"
+                                   string="Used Qty"
+                                   readonly="parent.parts_state != 'under_repair'"/>
+                            <field name="product_uom"
+                                   string="UoM"
+                                   options="{'no_open': True, 'no_create': True}"
+                                   readonly="parent.parts_state not in ('none', 'draft')"/>
+                            <field name="lot_ids"
+                                   string="Lot/Serial"
+                                   widget="many2many_tags"
+                                   groups="stock.group_production_lot"
+                                   optional="show"
+                                   readonly="1"/>
+                            <button name="action_show_details"
+                                    type="object"
+                                    icon="fa-list"
+                                    title="Lot/Serial Details"
+                                    invisible="not show_details_visible"/>
+                            <field name="maintenance_billable"
+                                   readonly="parent.parts_state == 'done'"/>
+                            <field name="price_unit"
+                                   string="Customer Price"
+                                   widget="monetary"
+                                   options="{'currency_field': 'maintenance_currency_id'}"
+                                   readonly="parent.parts_state == 'done'"/>
+                            <field name="maintenance_line_cost"
+                                   string="Part Cost"
+                                   widget="monetary"
+                                   options="{'currency_field': 'maintenance_currency_id'}"
+                                   readonly="1"/>
+                        </list>
+                    </field>
+                    <group>
+                        <group>
+                            <field name="parts_under_warranty"
+                                   readonly="parts_state in ('done', 'cancel')"/>
+                            <field name="parts_state" widget="badge"/>
+                        </group>
+                        <group>
+                            <field name="spare_parts_source_location_id" readonly="1"/>
+                            <field name="spare_parts_consumption_location_id" readonly="1"/>
+                            <field name="spare_parts_cost" readonly="1"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="alert">
+                        Reserved quantities remain in the Spare Parts location until you consume the actual used quantity. Any unused reservation is released automatically.
+                    </div>
+                </page>
                 <page string="Customer Acceptance">
                     <group>
                         <field name="customer_accepted"/>

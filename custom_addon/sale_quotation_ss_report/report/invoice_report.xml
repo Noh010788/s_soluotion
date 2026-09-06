@@ -119,12 +119,16 @@
                         .ss_invoice_right { text-align: right; }
                         .ss_invoice_bold { font-weight: 700; }
                         .ss_invoice_partner_box { min-height: 36px; }
+                        .ss_invoice_info_row td {
+                            border: 0 !important;
+                            padding: 2px 4px;
+                            vertical-align: top;
+                        }
                         .ss_invoice_line {
-                            text-align: center;
-                            line-height: 1.75;
-                            height: 150px;
-                            min-height: 150px;
-                            padding-top: 12px;
+                            text-align: left;
+                            line-height: 1.45;
+                            min-height: 170px;
+                            padding: 8px 4px;
                             box-sizing: border-box;
                         }
                         .ss_invoice_product_img {
@@ -196,43 +200,42 @@
                             <col t-if="show_discount" style="width: 20%;"/>
                         </colgroup>
                         <tbody>
-                            <tr>
-                                <td colspan="2" rowspan="3" style="vertical-align: middle; text-align: left;">
+                            <tr class="ss_invoice_info_row">
+                                <td colspan="2" rowspan="3" style="vertical-align: top; text-align: left;">
                                     <div>
-                                        ພະນັກງານຂາຍ:
-                                        <span t-if="o.invoice_user_id" t-field="o.invoice_user_id.name"/>
+                                        Customer: <span t-field="o.partner_id.name"/>
                                     </div>
-                                    <div t-if="o.invoice_user_id.employee_id.work_phone">
-                                        ເບີໂທ: <span t-field="o.invoice_user_id.employee_id.work_phone"/>
+                                    <div>
+                                        Address:
+                                        <span t-out="', '.join([part for part in [o.partner_id.street, o.partner_id.street2, o.partner_id.city, o.partner_id.state_id.name if o.partner_id.state_id else False, o.partner_id.country_id.name if o.partner_id.country_id else False] if part])"/>
                                     </div>
-                                    <div t-elif="o.invoice_user_id.employee_id.mobile_phone">
-                                        ເບີໂທ: <span t-field="o.invoice_user_id.employee_id.mobile_phone"/>
+                                    <div>
+                                        Tel:
+                                        <span t-if="o.partner_id.phone" t-field="o.partner_id.phone"/>
+                                        <span t-elif="o.partner_id.mobile" t-field="o.partner_id.mobile"/>
                                     </div>
                                 </td>
-                                <td t-att-colspan="4 if show_discount else 3" class="ss_invoice_right">
+                                <td t-att-colspan="4 if show_discount else 3" class="ss_invoice_right" style="text-align: right; padding-right: 38px;">
                                     ເລກທີ: <span t-field="o.name"/>
                                 </td>
                             </tr>
-                            <tr>
-                                <td t-att-colspan="4 if show_discount else 3" class="ss_invoice_right">
+                            <tr class="ss_invoice_info_row">
+                                <td t-att-colspan="4 if show_discount else 3" class="ss_invoice_right" style="text-align: right; padding-right: 38px;">
                                     ວັນທີ:
                                     <span t-if="o.invoice_date" t-field="o.invoice_date" t-options='{"widget": "date", "format": "dd / MM / yyyy"}'/>
                                 </td>
                             </tr>
-                            <tr>
+                            <tr class="ss_invoice_info_row">
                                 <td t-att-colspan="4 if show_discount else 3" class="ss_invoice_partner_box">
-                                    <div>ຂໍສະເໜີຂາຍໃຫ້: <span t-field="o.partner_id.name"/></div>
-                                    <div t-if="o.partner_id.phone">ໂທ: <span t-field="o.partner_id.phone"/></div>
-                                    <div t-elif="o.partner_id.mobile">ໂທ: <span t-field="o.partner_id.mobile"/></div>
                                 </td>
                             </tr>
-                            <tr>
-                                <th>ລຳດັບ</th>
-                                <th>ລາຍການ</th>
-                                <th>ຈຳນວນ</th>
-                                <th>ລາຄາຕໍ່ຫົວໜ່ວຍ</th>
-                                <th t-if="show_discount">ສ່ວນຫຼຸດ</th>
-                                <th>ລາຄາລວມ</th>
+                            <tr class="ss_invoice_info_row">
+                                <th>Item</th>
+                                <th>Description</th>
+                                <th>Quantity<br/>(Units)</th>
+                                <th>Unit price<br/>LAK</th>
+                                <th t-if="show_discount">Discount</th>
+                                <th>Amount<br/>LAK</th>
                             </tr>
 
                             <t t-set="line_number" t-value="0"/>
@@ -245,9 +248,11 @@
                                     <td>
                                         <div class="ss_invoice_line">
                                             <div t-field="line.name" style="white-space: pre-line;"/>
-                                            <img t-if="line.product_id.image_1920"
-                                                 t-att-src="image_data_uri(line.product_id.image_1920)"
-                                                 class="ss_invoice_product_img"/>
+                                            <t t-set="serial_numbers" t-value="', '.join(line.sale_line_ids.mapped('move_ids.move_line_ids.lot_id.name'))"/>
+                                            <div t-if="line.product_id.product_tmpl_id.warranty_period_months">
+                                                Warranty: <span t-out="line.product_id.product_tmpl_id.warranty_period_months"/> months
+                                            </div>
+                                            <div t-if="serial_numbers">Serial Number: <span t-out="serial_numbers"/></div>
                                         </div>
                                     </td>
                                     <td class="ss_invoice_center" style="vertical-align: middle;">
@@ -276,54 +281,33 @@
 
                             <tr class="ss_summary_row" t-att-style="'page-break-before: always; break-before: page;' if line_number and line_number % 4 == 0 else ''">
                                 <td colspan="2" rowspan="3" class="ss_invoice_note">
-                                    <div>ໝາຍເຫດ:</div>
+                                    <div style="text-align: center;">Remark:</div>
                                     <t t-foreach="note_lines" t-as="note_line">
                                         <div style="white-space: pre-line;" t-field="note_line.name"/>
                                     </t>
                                 </td>
-                                <td t-att-colspan="3 if show_discount else 2" class="ss_invoice_summary_label">ລວມເງິນ</td>
+                                <td t-att-colspan="3 if show_discount else 2" class="ss_invoice_summary_label">ລວມເງິນ/Total</td>
                                 <td class="ss_invoice_amount">
                                     <span t-out="'{:,.0f} {}'.format(o.amount_untaxed, o.currency_id.symbol or '').strip()"/>
                                 </td>
                             </tr>
                             <tr class="ss_summary_row">
-                                <td t-att-colspan="3 if show_discount else 2" class="ss_invoice_summary_label">ອາກອນມູນຄ່າເພີ່ມ 10%</td>
+                                <td t-att-colspan="3 if show_discount else 2" class="ss_invoice_summary_label">VAT 10%</td>
                                 <td class="ss_invoice_amount">
                                     <span t-out="'{:,.0f} {}'.format(o.amount_tax, o.currency_id.symbol or '').strip()"/>
                                 </td>
                             </tr>
                             <tr class="ss_summary_row">
-                                <td t-att-colspan="3 if show_discount else 2" class="ss_invoice_summary_label">ລວມທັງໝົດ</td>
+                                <td t-att-colspan="3 if show_discount else 2" class="ss_invoice_summary_label">ລວມທັງໝົດ/Total Amount</td>
                                 <td class="ss_invoice_amount ss_invoice_bold">
                                     <span t-out="'{:,.0f} {}'.format(o.amount_total, o.currency_id.symbol or '').strip()"/>
                                 </td>
                             </tr>
 
-                            <tr class="ss_bank_row">
-                                <td t-att-colspan="6 if show_discount else 5" class="ss_invoice_center" style="height: 62px;">
-                                    <div>ຮູບແບບການຊຳລະເງິນ ຊື່ບັນຊີ: <span t-field="o.company_id.name"/></div>
-                                    <div>
-                                        ເລກບັນຊີ:
-                                        <span t-if="o.company_id.partner_id.bank_ids" t-field="o.company_id.partner_id.bank_ids[0].acc_number"/>
-                                        <span t-if="o.company_id.partner_id.bank_ids">
-                                            (<span t-field="o.company_id.partner_id.bank_ids[0].bank_id.name"/>)
-                                        </span>
-                                    </div>
-                                </td>
-                            </tr>
-
                             <tr class="ss_signature_row">
-                                <td t-att-colspan="6 if show_discount else 5" style="padding: 0;">
-                                    <table class="ss_signature_split">
-                                        <tr>
-                                            <td style="width: 50%;">
-                                                <div>ຜູ້ອະນຸມັດຊື້</div>
-                                            </td>
-                                            <td style="width: 50%; border-left: 1px solid #000;">
-                                                <div>ຜູ້ອຳນວຍການ</div>
-                                            </td>
-                                        </tr>
-                                    </table>
+                                <td t-att-colspan="6 if show_discount else 5"
+                                    style="border: 0 !important; height: 220px; padding: 0 70px 10px 0; text-align: right; vertical-align: bottom;">
+                                    Director
                                 </td>
                             </tr>
                         </tbody>

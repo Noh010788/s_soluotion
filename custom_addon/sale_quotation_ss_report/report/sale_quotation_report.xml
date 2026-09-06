@@ -219,15 +219,11 @@
                             <tr>
                                 <td colspan="2" rowspan="3" style="vertical-align: middle; text-align: left;">
                                     <div>
-                                        ພະນັກງານຂາຍ:
-                                        <span t-if="doc.user_id" t-field="doc.user_id.name"/>
+                                        ຂໍສະເໜີຂາຍໃຫ້:
+                                        <span t-field="doc.partner_id.name"/>
                                     </div>
-                                    <div t-if="doc.user_id.employee_id.work_phone">
-                                        ເບີໂທ: <span t-field="doc.user_id.employee_id.work_phone"/>
-                                    </div>
-                                    <div t-elif="doc.user_id.employee_id.mobile_phone">
-                                        ເບີໂທ: <span t-field="doc.user_id.employee_id.mobile_phone"/>
-                                    </div>
+                                    <div t-if="doc.partner_id.phone">ໂທ: <span t-field="doc.partner_id.phone"/></div>
+                                    <div t-elif="doc.partner_id.mobile">ໂທ: <span t-field="doc.partner_id.mobile"/></div>
                                 </td>
                                 <td t-att-colspan="4 if show_discount else 3" class="ss_right">ເລກທີ: <span t-field="doc.name"/></td>
                             </tr>
@@ -235,10 +231,13 @@
                                 <td t-att-colspan="4 if show_discount else 3" class="ss_right">ວັນທີ: <span t-field="doc.date_order" t-options='{"widget": "date", "format": "dd / MM / yyyy"}'/></td>
                             </tr>
                             <tr>
-                                <td t-att-colspan="4 if show_discount else 3" class="ss_partner_box">
-                                    <div>ຂໍສະເໜີຂາຍໃຫ້: <span t-field="doc.partner_id.name"/></div>
-                                    <div t-if="doc.partner_id.phone">ໂທ: <span t-field="doc.partner_id.phone"/></div>
-                                    <div t-elif="doc.partner_id.mobile">ໂທ: <span t-field="doc.partner_id.mobile"/></div>
+                                <td t-att-colspan="4 if show_discount else 3" class="ss_partner_box" style="text-align: left;">
+                                    <div>
+                                        ພະນັກງານຂາຍ:
+                                        <span t-if="doc.user_id" t-field="doc.user_id.name"/>
+                                    </div>
+                                    <div t-if="doc.user_id.employee_id.work_phone">ເບີໂທ: <span t-field="doc.user_id.employee_id.work_phone"/></div>
+                                    <div t-elif="doc.user_id.employee_id.mobile_phone">ເບີໂທ: <span t-field="doc.user_id.employee_id.mobile_phone"/></div>
                                 </td>
                             </tr>
                             <tr>

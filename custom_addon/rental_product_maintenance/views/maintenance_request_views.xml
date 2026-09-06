@@ -75,6 +75,14 @@
                        domain="[('order_id', '=', rental_order_id), ('order_id.order_type', '=', 'rental')]"/>
                 <field name="rental_unit_number"/>
             </field>
+            <xpath expr="//field[@name='user_id']" position="replace">
+                <field name="responsible_ids"
+                       string="Responsible"
+                       widget="many2many_tags"
+                       options="{'no_create': True}"
+                       domain="[('share', '=', False)]"/>
+                <field name="user_id" invisible="1"/>
+            </xpath>
             <xpath expr="//label[@for='recurring_maintenance']" position="before">
                 <field name="maintenance_end_datetime"/>
             </xpath>
@@ -166,6 +174,71 @@
                         <field name="customer_signature" widget="image"/>
                     </group>
                 </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="rental_product_maintenance_kanban_responsibles" model="ir.ui.view">
+        <field name="name">rental_product_maintenance.maintenance.request.kanban.responsibles</field>
+        <field name="model">maintenance.request</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_request_view_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='schedule_date']" position="after">
+                <span t-if="record.responsible_ids.raw_value" class="d-block text-muted">
+                    <strong>Responsible:</strong>
+                    <field name="responsible_ids" widget="many2many_tags"/>
+                </span>
+            </xpath>
+            <xpath expr="//field[@name='user_id' and @widget='many2one_avatar_user']" position="replace">
+                <field name="responsible_ids" widget="many2many_tags" class="ms-1"/>
+            </xpath>
+            <xpath expr="//field[@name='responsible_ids' and hasclass('ms-1')]" position="after">
+                <a type="edit"
+                   role="button"
+                   class="btn btn-link btn-sm ms-2 p-0"
+                   title="Assign multiple responsible users">
+                    Assign Responsible
+                </a>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Show the product type (including Service) in the product picker used by Repair. -->
+    <record id="repair_product_picker_type" model="ir.ui.view">
+        <field name="name">repair.product.picker.type</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_product_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='type']" position="attributes">
+                <attribute name="optional">show</attribute>
+                <attribute name="string">Product Type</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="repair_product_picker_search_type" model="ir.ui.view">
+        <field name="name">repair.product.picker.search.type</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_search_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="type" string="Product Type"/>
+            </xpath>
+            <xpath expr="//filter[@name='inactive']" position="after">
+                <filter name="service_products" string="Service" domain="[('type', '=', 'service')]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Repair parts may include service products (for example, labor/service fees). -->
+    <record id="repair_order_parts_allow_service" model="ir.ui.view">
+        <field name="name">repair.order.parts.allow.service</field>
+        <field name="model">repair.order</field>
+        <field name="inherit_id" ref="repair.view_repair_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='move_ids']/list/field[@name='product_id']" position="attributes">
+                <attribute name="domain">[('type', 'in', ('consu', 'service'))]</attribute>
+                <attribute name="context">{'default_is_storable': False}</attribute>
             </xpath>
         </field>
     </record>

@@ -6,11 +6,12 @@
     "summary": "Custom quotation print layout for Sale orders",
     "author": "S Solution",
     "license": "LGPL-3",
-    "depends": ["sale", "stock"],
+    "depends": ["account", "sale", "stock"],
     "data": [
         "report/sale_quotation_report.xml",
         "report/delivery_slip_report.xml",
         "report/invoice_report.xml",
+        "views/invoice_line_views.xml",
     ],
     "installable": True,
     "application": False,

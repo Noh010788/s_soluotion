@@ -1,0 +1,43 @@
+<odoo>
+    <record id="product_template_form_warranty" model="ir.ui.view">
+        <field name="name">product.template.form.warranty</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='categ_id']" position="after">
+                <field name="warranty_period_months"/>
+                <field name="warranty_type"/>
+                <field name="warranty_terms" placeholder="Warranty terms and conditions..."/>
+            </xpath>
+        </field>
+    </record>
+    <record id="stock_lot_form_warranty" model="ir.ui.view">
+        <field name="name">stock.lot.form.warranty</field>
+        <field name="model">stock.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="warranty_start_date"/>
+                <field name="warranty_expiry_date"/>
+                <field name="warranty_active"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="warranty_claim_form" model="ir.ui.view">
+        <field name="name">warranty.claim.form</field>
+        <field name="model">warranty.claim</field>
+        <field name="arch" type="xml">
+            <form string="Warranty Claim">
+                <header><field name="state" widget="statusbar" statusbar_visible="new,repair,done,rejected"/></header>
+                <sheet><group><group><field name="name"/><field name="customer_id"/><field name="product_id"/><field name="lot_id"/><field name="claim_date"/></group><group><field name="invoice_id"/><field name="picking_id"/><field name="warranty_start_date"/><field name="warranty_expiry_date"/><field name="in_warranty"/></group></group><notebook><page string="Problem"><field name="issue"/></page><page string="Costs"><group><field name="parts_cost"/><field name="labor_cost"/><field name="currency_id"/></group></page><page string="Terms"><field name="warranty_terms"/></page></notebook></sheet>
+            </form>
+        </field>
+    </record>
+    <record id="warranty_claim_tree" model="ir.ui.view">
+        <field name="name">warranty.claim.tree</field><field name="model">warranty.claim</field>
+        <field name="arch" type="xml"><list><field name="name"/><field name="customer_id"/><field name="product_id"/><field name="lot_id"/><field name="claim_date"/><field name="in_warranty"/><field name="state"/></list></field>
+    </record>
+    <record id="action_warranty_claim" model="ir.actions.act_window"><field name="name">Warranty Claims</field><field name="res_model">warranty.claim</field><field name="view_mode">list,form</field></record>
+    <menuitem id="menu_warranty_root" name="Warranty" parent="rental_menu_base.menu_rental_root" sequence="50"/>
+    <menuitem id="menu_warranty_claim" name="Warranty Claims" parent="menu_warranty_root" action="action_warranty_claim"/>
+</odoo>

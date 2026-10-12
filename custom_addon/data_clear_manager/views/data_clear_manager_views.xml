@@ -10,13 +10,15 @@
                     <div invisible="clear_target">
                         <h2>Clear Data</h2>
                         <p class="text-muted">
-                            These buttons clear transaction data only. Master data such as products,
-                            partners, warehouses, journals, and chart of accounts is kept.
+                            Transaction buttons clear their respective data areas. Clear Product removes one selected
+                            product template and its variants only when no records still depend on them. Other master
+                            data such as partners, warehouses, journals, and chart of accounts is kept.
                         </p>
                         <group>
                             <group>
                                 <button name="action_open_sale_clear" type="object" string="Clear Sale" class="btn-primary"/>
                                 <button name="action_open_purchase_clear" type="object" string="Clear Purchase" class="btn-primary"/>
+                                <button name="action_open_product_clear" type="object" string="Clear Product" class="btn-primary"/>
                                 <button name="action_open_inventory_clear" type="object" string="Clear Inventory" class="btn-primary"/>
                             </group>
                             <group>
@@ -30,11 +32,20 @@
                         <h2>Confirm Clear Data</h2>
                         <group>
                             <field name="clear_target"/>
+                            <field name="product_template_id"
+                                   invisible="clear_target != 'product'"
+                                   required="clear_target == 'product'"
+                                   context="{'active_test': False}"
+                                   options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"/>
                             <field name="confirm_text" placeholder="Type CLEAR"/>
                         </group>
-                        <p class="alert alert-warning" role="alert">
+                        <p class="alert alert-warning" role="alert" invisible="clear_target == 'product'">
                             This will permanently delete transaction data for the selected area.
                             Type CLEAR and click Confirm Clear to continue.
+                        </p>
+                        <p class="alert alert-warning" role="alert" invisible="clear_target != 'product'">
+                            This permanently deletes the selected product template and all its variants, if they are
+                            not referenced by other records. Type CLEAR followed by the exact product name to continue.
                         </p>
                     </div>
                 </sheet>

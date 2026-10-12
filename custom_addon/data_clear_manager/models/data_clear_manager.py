@@ -1,4 +1,4 @@
-from psycopg2 import sql
+from psycopg2 import IntegrityError, sql
 
 from odoo import _, fields, models
 from odoo.exceptions import UserError
@@ -12,6 +12,7 @@ class DataClearManager(models.TransientModel):
         [
             ("sale", "Sale"),
             ("purchase", "Purchase"),
+            ("product", "Product"),
             ("inventory", "Inventory"),
             ("rental", "Rental"),
             ("maintenance", "Maintenance"),
@@ -20,7 +21,15 @@ class DataClearManager(models.TransientModel):
         string="Data Type",
         readonly=True,
     )
-    confirm_text = fields.Char(string="Confirmation")
+    confirm_text = fields.Char(
+        string="Confirmation",
+        help="For a product, type CLEAR followed by the exact product name shown above.",
+    )
+    product_template_id = fields.Many2one(
+        "product.template",
+        string="Product to Clear",
+        help="Select one product template. If it has variants, all variants are included.",
+    )
     result_message = fields.Text(string="Result", readonly=True)
 
     def action_open_sale_clear(self):
@@ -28,6 +37,9 @@ class DataClearManager(models.TransientModel):
 
     def action_open_purchase_clear(self):
         return self._open_confirm("purchase")
+
+    def action_open_product_clear(self):
+        return self._open_confirm("product")
 
     def action_open_inventory_clear(self):
         return self._open_confirm("inventory")
@@ -43,10 +55,11 @@ class DataClearManager(models.TransientModel):
 
     def action_clear_data(self):
         self.ensure_one()
-        if self.confirm_text != "CLEAR":
-            raise UserError(_("Type CLEAR to confirm this operation."))
         if not self.clear_target:
             raise UserError(_("Please select data to clear."))
+
+        if self.clear_target != "product" and (self.confirm_text or "").strip() != "CLEAR":
+            raise UserError(_("Type CLEAR to confirm this operation."))
 
         clear_method = getattr(self, f"_clear_{self.clear_target}")
         deleted_count = clear_method()
@@ -190,6 +203,30 @@ class DataClearManager(models.TransientModel):
         self._delete_where("purchase_order", "id = ANY(%s)", [order_ids])
         self._reset_sequences(["purchase.order"])
         return len(order_ids)
+
+    def _clear_product(self):
+        self.ensure_one()
+        product = self.product_template_id
+        if not product:
+            raise UserError(_("Select one product to clear."))
+
+        product_name = product.display_name
+        expected_confirmation = f"CLEAR {product_name}"
+        if (self.confirm_text or "").strip() != expected_confirmation:
+            raise UserError(
+                _("Type %(confirmation)s to clear this product and its variants.")
+                % {"confirmation": expected_confirmation}
+            )
+
+        try:
+            with self.env.cr.savepoint():
+                product.unlink()
+        except IntegrityError as error:
+            raise UserError(
+                _("Cannot clear %(product)s because other records still reference it. Resolve those references first.")
+                % {"product": product_name}
+            ) from error
+        return 1
 
     def _clear_maintenance(self):
         request_ids = self._fetch_ids("SELECT id FROM maintenance_request")

@@ -26,7 +26,23 @@ def build_page_css(
     )
 
 
-def build_font_css(regular_url, bold_url):
+def build_font_css(regular_url, bold_url, fallback_regular_url=None, fallback_bold_url=None):
+    fallback_css = ""
+    if fallback_regular_url and fallback_bold_url:
+        fallback_css = f"""
+@font-face {{
+    font-family: "Tahoma";
+    src: url("{fallback_regular_url}") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+}}
+@font-face {{
+    font-family: "Tahoma";
+    src: url("{fallback_bold_url}") format("truetype");
+    font-weight: 700;
+    font-style: normal;
+}}
+"""
     return f"""
 @font-face {{
     font-family: "Phetsarath OT";
@@ -40,4 +56,5 @@ def build_font_css(regular_url, bold_url):
     font-weight: 700;
     font-style: normal;
 }}
+{fallback_css}
 """.strip()

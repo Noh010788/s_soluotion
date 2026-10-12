@@ -1,0 +1,16 @@
+<odoo>
+ <record id="report_action" model="ir.actions.report"><field name="name">Rental Billing Statement</field><field name="model">rental.billing.statement</field><field name="report_type">qweb-pdf</field><field name="report_name">rental_billing_statement.document</field><field name="print_report_name">'Rental Billing - %s' % object.name.replace('/', '-')</field></record>
+ <template id="document"><t t-call="web.html_container"><t t-foreach="docs" t-as="o"><t t-call="web.basic_layout"><div class="page" style="font-family: 'Tahoma', 'Phetsarath OT', sans-serif; font-size: 13px;">
+ <img src="/sale_quotation_ss_report/static/src/img/header.jpg" style="width:100%; margin-bottom:20px;"/>
+ <h2 style="text-align:center">ໃບແຈ້ງເກັບເງິນຄ່າເຊົ່າ / Rental Billing Statement</h2>
+ <p><strong>Branch: </strong><span t-field="o.company_id.name"/></p>
+ <p><strong>Customer: </strong><span t-field="o.partner_id.name"/></p>
+ <p><strong>Statement: </strong><span t-field="o.name"/> | <strong>Invoice: </strong><span t-field="o.invoice_id.name"/></p>
+ <p><strong>Billing date: </strong><span t-field="o.date"/> | <strong>Due date: </strong><span t-field="o.due_date"/></p>
+ <p>Installments <span t-field="o.first_month"/> – <span t-out="o.first_month + o.months - 1"/> (<span t-field="o.months"/> months): <span t-field="o.period_start"/> – <span t-field="o.period_end"/></p>
+ <table style="width:100%; border-collapse:collapse" border="1" cellpadding="8"><thead><tr><th>Description</th><th>Quantity</th><th>Discount %</th><th>Tax</th><th>Period amount</th></tr></thead><tbody><tr t-foreach="o.line_ids" t-as="l"><td style="white-space:pre-wrap"><span t-field="l.name"/></td><td><span t-field="l.quantity"/></td><td><span t-field="l.discount"/></td><td><span t-field="l.tax_names"/></td><td><span t-field="l.subtotal"/></td></tr></tbody></table>
+ <div style="text-align:right; margin-top:15px"><p>Untaxed: <span t-field="o.amount_untaxed"/></p><p>Tax: <span t-field="o.amount_tax"/></p><p><strong>Period total: <span t-field="o.amount_total"/></strong></p><p>Allocated settlement: <span t-field="o.settled_amount"/></p><p>Period outstanding: <span t-field="o.amount_due"/></p></div>
+ <p>This billing statement refers to the original invoice. It is not a new tax invoice or payment receipt. Settlement shown is allocated earliest-first and may include credits or write-offs.</p>
+ <p style="margin-top:60px; text-align:right">Authorized signature __________________</p>
+ </div></t></t></t></template>
+</odoo>

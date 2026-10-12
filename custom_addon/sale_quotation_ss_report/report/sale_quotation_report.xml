@@ -26,19 +26,19 @@
                 <div class="ss_quote_page">
                     <style>
                         @font-face {
-                            font-family: "Phetsarath OT";
+                            font-family: "Tahoma", "Phetsarath OT", sans-serif;
                             src: url("/sale_quotation_ss_report/static/src/fonts/Phetsarath_OT.ttf") format("truetype");
                             font-weight: normal;
                             font-style: normal;
                         }
                         @font-face {
-                            font-family: "Phetsarath OT";
+                            font-family: "Tahoma", "Phetsarath OT", sans-serif;
                             src: url("/sale_quotation_ss_report/static/src/fonts/Phetsarath_OT_Bold.ttf") format("truetype");
                             font-weight: 700;
                             font-style: normal;
                         }
                         .ss_quote_page {
-                            font-family: "Phetsarath OT";
+                            font-family: "Tahoma", "Phetsarath OT", sans-serif;
                             font-size: 13px;
                             color: #000;
                             padding: 0;
@@ -47,7 +47,7 @@
                             overflow: visible !important;
                         }
                         .ss_quote_page * {
-                            font-family: "Phetsarath OT" !important;
+                            font-family: "Tahoma", "Phetsarath OT", sans-serif !important;
                         }
                         html,
                         body,
@@ -354,3 +354,4 @@
         </xpath>
     </template>
 </odoo>
+

@@ -38,6 +38,8 @@ class IrActionsReport(models.Model):
         font_css = build_font_css(
             regular_url=(_FONT_DIR / "Phetsarath_OT.ttf").as_uri(),
             bold_url=(_FONT_DIR / "Phetsarath_OT_Bold.ttf").as_uri(),
+            fallback_regular_url=(_FONT_DIR / "Tahoma.ttf").as_uri(),
+            fallback_bold_url=(_FONT_DIR / "Tahoma_Bold.ttf").as_uri(),
         )
         font_config = FontConfiguration()
         stylesheets = [

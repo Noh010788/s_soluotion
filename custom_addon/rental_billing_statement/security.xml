@@ -1,0 +1,6 @@
+<odoo>
+ <record id="statement_access" model="ir.model.access"><field name="name">Rental billing accountant</field><field name="model_id" ref="model_rental_billing_statement"/><field name="group_id" ref="account.group_account_invoice"/><field name="perm_read" eval="True"/><field name="perm_write" eval="True"/><field name="perm_create" eval="True"/><field name="perm_unlink" eval="True"/></record>
+ <record id="line_access" model="ir.model.access"><field name="name">Rental billing lines</field><field name="model_id" ref="model_rental_billing_statement_line"/><field name="group_id" ref="account.group_account_invoice"/><field name="perm_read" eval="True"/><field name="perm_create" eval="True"/></record>
+ <record id="statement_company" model="ir.rule"><field name="name">Billing company</field><field name="model_id" ref="model_rental_billing_statement"/><field name="domain_force">[('company_id', 'in', company_ids)]</field></record>
+ <record id="line_company" model="ir.rule"><field name="name">Billing line company</field><field name="model_id" ref="model_rental_billing_statement_line"/><field name="domain_force">[('company_id', 'in', company_ids)]</field></record>
+</odoo>

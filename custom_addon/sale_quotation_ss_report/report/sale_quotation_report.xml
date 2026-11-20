@@ -157,7 +157,7 @@
                             height: 62px;
                         }
                         .ss_signature_cell {
-                            height: 178px;
+                            height: 255px;
                             text-align: center;
                         }
                         table.ss_signature_split {
@@ -167,15 +167,20 @@
                         }
                         .ss_signature_split td {
                             border: 0;
-                            height: 178px;
+                            height: 255px;
                             padding: 4px 7px;
                             text-align: center;
                             vertical-align: top;
                         }
                         .ss_signature_img {
-                            max-width: 210px;
-                            max-height: 125px;
-                            margin-top: 18px;
+                            width: 220px;
+                            height: 220px;
+                            max-width: 220px;
+                            max-height: 220px;
+                            object-fit: contain;
+                            margin-top: 10px;
+                            transform: scale(2.2);
+                            transform-origin: center center;
                         }
                         .ss_summary_page {
                             margin-top: 8px;

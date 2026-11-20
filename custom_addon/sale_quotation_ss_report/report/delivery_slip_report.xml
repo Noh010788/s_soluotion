@@ -113,7 +113,7 @@
                             }
                             .ss_delivery_signatures td {
                                 width: 50%;
-                                height: 135px;
+                                height: 190px;
                                 border: 0 !important;
                                 text-align: center;
                                 vertical-align: top;
@@ -121,7 +121,7 @@
                                 padding-top: 8px;
                             }
                             .ss_delivery_signature_meta {
-                                margin-top: 105px;
+                                margin-top: 160px;
                                 text-align: center;
                                 padding-left: 0;
                                 font-weight: 400;
@@ -235,7 +235,7 @@
                             <tr>
                                 <td>
                                     ຜູ້ຮັບສິນຄ້າ
-                                    <div class="ss_delivery_signature_meta" style="width: 100%; margin-top: 105px !important; padding-left: 0 !important; text-align: center !important;">
+                                    <div class="ss_delivery_signature_meta" style="width: 100%; margin-top: 160px !important; padding-left: 0 !important; text-align: center !important;">
                                         <div>ວັນທີ: ....../....../............</div>
                                         <div>ໂທ: ..............................</div>
                                     </div>

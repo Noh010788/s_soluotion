@@ -305,7 +305,7 @@
                             <tr class="ss_signature_row">
                                 <td t-att-colspan="6 if show_discount else 5"
                                     style="border: 0 !important; height: 220px; padding: 0 70px 10px 0; text-align: right; vertical-align: bottom;">
-                                    Director
+                                    <div style="transform: translateY(85px);">ຜູ້ອຳນວຍການ</div>
                                 </td>
                             </tr>
                         </tbody>

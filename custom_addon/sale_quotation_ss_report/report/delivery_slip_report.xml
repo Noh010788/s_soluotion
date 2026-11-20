@@ -12,7 +12,7 @@
                 <t t-set="partner" t-value="o.partner_id or (o.move_ids and o.move_ids[0].partner_id) or False"/>
                 <t t-set="delivery_date" t-value="o.date_done if o.state == 'done' else o.scheduled_date"/>
                 <t t-set="moves" t-value="o.move_ids.filtered(lambda move: move.product_uom_qty)"/>
-                <t t-set="delivery_no" t-value="'SSS%s%s' % (o.name.split('/')[-1][-3:], delivery_date.strftime('%Y')) if o.name and delivery_date else o.name"/>
+                <t t-set="delivery_no" t-value="'SSS/%s/%s' % (o.name.split('/')[-1][-3:], delivery_date.strftime('%Y')) if o.name and delivery_date else o.name"/>
                 <t t-call="web.basic_layout">
                     <div class="page ss_delivery_page">
                         <style>
@@ -138,15 +138,15 @@
                             <colgroup>
                                 <col style="width: 13%;"/>
                                 <col style="width: 57%;"/>
-                                <col style="width: 10%;"/>
-                                <col style="width: 20%;"/>
+                                <col style="width: 30%;"/>
                             </colgroup>
                             <tbody>
                                 <tr>
                                     <td class="ss_label">Customer:</td>
                                     <td><span t-if="partner" t-field="partner.name"/></td>
-                                    <td class="ss_label">No:</td>
-                                    <td><span t-out="delivery_no"/></td>
+                                    <td colspan="2" style="text-align: right; padding-right: 38px;">
+                                        ເລກທີ: <span t-out="delivery_no"/>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td class="ss_label">Address:</td>
@@ -154,8 +154,10 @@
                                         <span t-if="partner"
                                               t-out="', '.join([part for part in [partner.street, partner.street2, partner.city, partner.state_id.name if partner.state_id else False, partner.country_id.name if partner.country_id else False] if part])"/>
                                     </td>
-                                    <td class="ss_label">Date:</td>
-                                    <td><span t-if="delivery_date" t-out="delivery_date.strftime('%d/%m/%Y')"/></td>
+                                    <td colspan="2" style="text-align: right; padding-right: 38px;">
+                                        ວັນທີ:
+                                        <span t-if="delivery_date" t-out="delivery_date.strftime('%d / %m / %Y')"/>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td class="ss_label">Tel:</td>
@@ -164,8 +166,7 @@
                                         <span t-elif="partner and partner.mobile" t-field="partner.mobile"/>
                                         <span t-else="">------------------------------</span>
                                     </td>
-                                    <td></td>
-                                    <td></td>
+                                    <td colspan="2"></td>
                                 </tr>
                             </tbody>
                         </table>

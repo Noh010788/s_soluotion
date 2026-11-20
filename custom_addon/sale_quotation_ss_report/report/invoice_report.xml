@@ -12,6 +12,7 @@
             <t t-set="o" t-value="o.with_context(lang=lang)"/>
             <t t-set="product_lines" t-value="o.invoice_line_ids.filtered(lambda line: line.display_type == 'product')"/>
             <t t-set="note_lines" t-value="o.invoice_line_ids.filtered(lambda line: line.display_type == 'line_note')"/>
+            <t t-set="invoice_no" t-value="'SSS/%s/%s' % (o.name.split('/')[-1][-3:], (o.invoice_date or o.create_date).strftime('%Y')) if o.name else ''"/>
             <t t-call="web.basic_layout">
                 <div class="ss_invoice_page">
                     <style>
@@ -203,20 +204,20 @@
                             <tr class="ss_invoice_info_row">
                                 <td colspan="2" rowspan="3" style="vertical-align: top; text-align: left;">
                                     <div>
-                                        Customer: <span t-field="o.partner_id.name"/>
+                                        ລູກຄ້າ: <span t-field="o.partner_id.name"/>
                                     </div>
                                     <div>
-                                        Address:
+                                        ທີ່ຢູ່:
                                         <span t-out="', '.join([part for part in [o.partner_id.street, o.partner_id.street2, o.partner_id.city, o.partner_id.state_id.name if o.partner_id.state_id else False, o.partner_id.country_id.name if o.partner_id.country_id else False] if part])"/>
                                     </div>
                                     <div>
-                                        Tel:
+                                        ໂທ:
                                         <span t-if="o.partner_id.phone" t-field="o.partner_id.phone"/>
                                         <span t-elif="o.partner_id.mobile" t-field="o.partner_id.mobile"/>
                                     </div>
                                 </td>
                                 <td t-att-colspan="4 if show_discount else 3" class="ss_invoice_right" style="text-align: right; padding-right: 38px;">
-                                    ເລກທີ: <span t-field="o.name"/>
+                                    ເລກທີ: <span t-out="invoice_no"/>
                                 </td>
                             </tr>
                             <tr class="ss_invoice_info_row">
@@ -230,12 +231,12 @@
                                 </td>
                             </tr>
                             <tr class="ss_invoice_info_row">
-                                <th>Item</th>
-                                <th>Description</th>
-                                <th>Quantity<br/>(Units)</th>
-                                <th>Unit price<br/>LAK</th>
-                                <th t-if="show_discount">Discount</th>
-                                <th>Amount<br/>LAK</th>
+                                <th>ລຳດັບ</th>
+                                <th>ລາຍການ</th>
+                                <th>ຈຳນວນ</th>
+                                <th>ລາຄາຕໍ່ໜ່ວຍ</th>
+                                <th t-if="show_discount">ສ່ວນຫຼຸດ</th>
+                                <th>ລາຄາລວມ</th>
                             </tr>
 
                             <t t-set="line_number" t-value="0"/>
@@ -249,9 +250,6 @@
                                         <div class="ss_invoice_line">
                                             <div t-field="line.name" style="white-space: pre-line;"/>
                                             <t t-set="serial_numbers" t-value="', '.join(line.sale_line_ids.mapped('move_ids.move_line_ids.lot_id.name'))"/>
-                                            <div t-if="line.product_id.product_tmpl_id.warranty_period_months">
-                                                Warranty: <span t-out="line.product_id.product_tmpl_id.warranty_period_months"/> months
-                                            </div>
                                             <div t-if="serial_numbers">Serial Number: <span t-out="serial_numbers"/></div>
                                         </div>
                                     </td>
@@ -281,7 +279,7 @@
 
                             <tr class="ss_summary_row" t-att-style="'page-break-before: always; break-before: page;' if line_number and line_number % 4 == 0 else ''">
                                 <td colspan="2" rowspan="3" class="ss_invoice_note">
-                                    <div style="text-align: center;">Remark:</div>
+                                    <div style="text-align: center;">ໝາຍເຫດ:</div>
                                     <t t-foreach="note_lines" t-as="note_line">
                                         <div style="white-space: pre-line;" t-field="note_line.name"/>
                                     </t>

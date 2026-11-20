@@ -21,6 +21,8 @@
     <template id="report_saleorder_document_ss" inherit_id="sale.report_saleorder_document" priority="99">
         <xpath expr="//t[@t-call='web.external_layout']" position="replace">
             <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)"/>
+            <t t-set="bank_partner" t-value="doc.company_id.partner_id if doc.company_id.partner_id.bank_ids else (doc.company_id.parent_id.partner_id if doc.company_id.parent_id and doc.company_id.parent_id.partner_id.bank_ids else doc.company_id.partner_id)"/>
+            <t t-set="quote_no" t-value="'SSS/%s/%s' % (doc.name[-3:], (doc.date_order or doc.create_date).strftime('%Y')) if doc.name else ''"/>
             <t t-set="lines_to_report" t-value="doc._get_order_lines_to_report()"/>
             <t t-call="web.basic_layout">
                 <div class="ss_quote_page">
@@ -225,7 +227,7 @@
                                     <div t-if="doc.partner_id.phone">ໂທ: <span t-field="doc.partner_id.phone"/></div>
                                     <div t-elif="doc.partner_id.mobile">ໂທ: <span t-field="doc.partner_id.mobile"/></div>
                                 </td>
-                                <td t-att-colspan="4 if show_discount else 3" class="ss_right">ເລກທີ: <span t-field="doc.name"/></td>
+                                <td t-att-colspan="4 if show_discount else 3" class="ss_right">ເລກທີ: <span t-out="quote_no"/></td>
                             </tr>
                             <tr>
                                 <td t-att-colspan="4 if show_discount else 3" class="ss_right">ວັນທີ: <span t-field="doc.date_order" t-options='{"widget": "date", "format": "dd / MM / yyyy"}'/></td>
@@ -236,8 +238,10 @@
                                         ພະນັກງານຂາຍ:
                                         <span t-if="doc.user_id" t-field="doc.user_id.name"/>
                                     </div>
-                                    <div t-if="doc.user_id.employee_id.work_phone">ເບີໂທ: <span t-field="doc.user_id.employee_id.work_phone"/></div>
-                                    <div t-elif="doc.user_id.employee_id.mobile_phone">ເບີໂທ: <span t-field="doc.user_id.employee_id.mobile_phone"/></div>
+                                    <div t-if="doc.user_id and doc.user_id.employee_id and doc.user_id.employee_id.work_phone">ເບີໂທ: <span t-field="doc.user_id.employee_id.work_phone"/></div>
+                                    <div t-elif="doc.user_id and doc.user_id.employee_id and doc.user_id.employee_id.mobile_phone">ເບີໂທ: <span t-field="doc.user_id.employee_id.mobile_phone"/></div>
+                                    <div t-elif="doc.user_id and doc.user_id.partner_id.phone">ເບີໂທ: <span t-field="doc.user_id.partner_id.phone"/></div>
+                                    <div t-elif="doc.user_id and doc.user_id.partner_id.mobile">ເບີໂທ: <span t-field="doc.user_id.partner_id.mobile"/></div>
                                 </td>
                             </tr>
                             <tr>
@@ -318,12 +322,16 @@
 
                             <tr class="ss_bank_row">
                                 <td t-att-colspan="6 if show_discount else 5" class="ss_center" style="height: 62px;">
-                                    <div>ຮູບແບບການຊຳລະເງິນ ຊື່ບັນຊີ: <span t-field="doc.company_id.name"/></div>
+                                    <div>
+                                        ຮູບແບບການຊຳລະເງິນ ຊື່ບັນຊີ:
+                                        <span t-if="bank_partner.bank_ids" t-out="bank_partner.bank_ids[0].acc_holder_name or bank_partner.name"/>
+                                        <span t-else="" t-field="doc.company_id.name"/>
+                                    </div>
                                     <div>
                                         ເລກບັນຊີ:
-                                        <span t-if="doc.company_id.partner_id.bank_ids" t-field="doc.company_id.partner_id.bank_ids[0].acc_number"/>
-                                        <span t-if="doc.company_id.partner_id.bank_ids">
-                                            (<span t-field="doc.company_id.partner_id.bank_ids[0].bank_id.name"/>)
+                                        <span t-if="bank_partner.bank_ids" t-field="bank_partner.bank_ids[0].acc_number"/>
+                                        <span t-if="bank_partner.bank_ids">
+                                            (<span t-field="bank_partner.bank_ids[0].bank_id.name"/>)
                                         </span>
                                     </div>
                                 </td>
